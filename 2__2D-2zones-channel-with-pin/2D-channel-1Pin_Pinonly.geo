@@ -94,3 +94,4 @@ Recombine Surface{33};
 Physical Line("pin_fluid_interface") = {32, 35, 38};
 Physical Line("pin_sym") = {31, 39};
 Physical Line("pin_inner") = {34, 36, 40};
+Physical Surface("pin_body") = {31, 32, 33};

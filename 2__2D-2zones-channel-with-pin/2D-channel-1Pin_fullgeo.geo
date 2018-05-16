@@ -124,6 +124,7 @@ Physical Line("outlet") = {22, 23};
 Physical Line("fluid_top") = {8, 13, 19};
 Physical Line("fluid_pin_interface") = {1, 2, 3};
 Physical Line("fluid_sym") = {5, 4, 16, 21};
+Physical Surface("fluid_body") = {1,2,3,4,5,6,7,8};
 //-------------------------------------------------------------------------------------//
 //Pin zone
 //Points
@@ -188,3 +189,4 @@ Recombine Surface{33};
 Physical Line("pin_fluid_interface") = {32, 35, 38};
 Physical Line("pin_sym") = {31, 39};
 Physical Line("pin_inner") = {34, 36, 40};
+Physical Surface("pin_body") = {31, 32, 33};

@@ -1,6 +1,6 @@
 # Kattmann, 05.2018, python 3.6
 #
-# Requires: .su2 meshes for each zone in current dir
+# Requires: .su2 meshes for each zone in current dir, or .geo files
 # Optional: gmsh .geo files for each zone seperatly in the dir, the .su2
 #           meshes are then created by setting "create_zone_meshes" to 1
 # Output: .su2 mesh with multiple zones
@@ -23,7 +23,7 @@ create_zone_meshes = 1
 # Create .su2 meshes out of .geo files with gmsh
 if create_zone_meshes:
   for file in geo_files:
-    create_mesh = ['gmsh', file+'.geo', '-2', '-f', 'su2', '-saveall', '-o', file+'.su2']
+    create_mesh = ['gmsh', file+'.geo', '-2', '-f', 'su2', '-o', file+'.su2']
     #create_mesh = 'gmsh ' + file+'.geo' + ' -2' + ' -f' + ' su2' + ' -saveall' + ' -o ' + file+'.su2'
     
     process = subprocess.check_output(create_mesh, stderr=subprocess.STDOUT)

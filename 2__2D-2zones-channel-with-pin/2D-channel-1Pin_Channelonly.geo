@@ -124,4 +124,5 @@ Physical Line("outlet") = {22, 23};
 Physical Line("fluid_top") = {8, 13, 19};
 Physical Line("fluid_pin_interface") = {1, 2, 3};
 Physical Line("fluid_sym") = {5, 4, 16, 21};
+Physical Surface("fluid_body") = {1,2,3,4,5,6,7,8};
 //-------------------------------------------------------------------------------------//
