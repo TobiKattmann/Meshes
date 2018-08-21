@@ -5,28 +5,31 @@
 ch_height = 2e-3;
 //ch_front & ch_back > pin_outer_r + ch_box
 ch_front = 3e-3; // front length
-ch_back = 3e-3; // back length
+ch_back = 5e-3; // back length
 ch_box = 0.5e-3; // for extension of pin mesh
 
 pin_outer_r = 1e-3;
-pin_inner_r = 0.3e-3;
+pin_inner_r = 0.25e-3;
 
 //Mesh inputs
 gridsize = 0.1; // unimportant one everything is structured
 
 //ch_box 
-Nch_box = 10;
-Rch_box = 1.2;
+Nch_box = 30;
+Rch_box = 1.1;
+
+Nch_front = 30;
+Nch_back = 60;
 
 //upper wall
-Nupper_wall = 10;
-Rupper_wall = 1.2;
+Nupper_wall = 20;
+Rupper_wall = 1.1;
 
 //Pin in radial direction
-Npin_radial = 10; // for all pin segments
-Rpin_radial = 1.2;
+Npin_radial = 80; // for all pin segments
+Rpin_radial = 1.;
 //Pin in circumferential direction
-Npin1_circ = 10; 
+Npin1_circ = 40; 
 Npin2_circ = 2*Npin1_circ;
 Npin3_circ = Npin1_circ;
 

@@ -58,4 +58,5 @@ Physical Line("top_block_walls") = {11,14};
 Physical Line("top_block_fluid_interface") = {16,15};
 Physical Line("top_block_topleft") = {12};
 Physical Line("top_block_topright") = {13};
+Physical Surface("solid_top") = {11,12};
 //-------------------------------------------------------------------------------------//

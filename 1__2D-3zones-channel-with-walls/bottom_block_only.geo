@@ -58,3 +58,4 @@ Physical Line("bottom_block_walls") = {26,23};
 Physical Line("bottom_block_fluid_interface") = {21,22};
 Physical Line("bottom_block_bottomleft") = {25};
 Physical Line("bottom_block_bottomright") = {24};
+Physical Surface("solid_bottom") = {21,22};

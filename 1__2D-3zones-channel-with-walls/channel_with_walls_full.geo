@@ -45,6 +45,7 @@ Physical Line("inlet") = {1};
 Physical Line("outlet") = {3};
 Physical Line("fluid_top") = {2};
 Physical Line("fluid_bottom") = {4};
+Physical Surface("fluid_body") = {1};
 //-------------------------------------------------------------------------------------//
 //Top block, solid zone
 Point(11) = {0, channel_height, 0, gridsize};
@@ -84,6 +85,7 @@ Physical Line("top_block_walls") = {11,14};
 Physical Line("top_block_fluid_interface") = {16,15};
 Physical Line("top_block_topleft") = {12};
 Physical Line("top_block_topright") = {13};
+Physical Surface("solid_top") = {11,12};
 //-------------------------------------------------------------------------------------//
 //Bottom  block, solid zone
 Point(21) = {0, 0, 0, gridsize};
@@ -120,6 +122,7 @@ Recombine Surface{22};
 
 //Physical Groups
 Physical Line("bottom_block_walls") = {26,23};
-Physical Line("bottom_block_fluid_interface") = {16,15};
-Physical Line("bottom_block_topleft") = {12};
-Physical Line("bottom_block_topright") = {13};
+Physical Line("bottom_block_fluid_interface") = {21,22};
+Physical Line("bottom_block_bottomleft") = {25};
+Physical Line("bottom_block_bottomright") = {24};
+Physical Surface("solid_bottom") = {21,22};

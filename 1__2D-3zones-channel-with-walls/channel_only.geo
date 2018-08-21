@@ -45,4 +45,5 @@ Physical Line("inlet") = {1};
 Physical Line("outlet") = {3};
 Physical Line("fluid_top") = {2};
 Physical Line("fluid_bottom") = {4};
+Physical Surface("fluid_body") = {1};
 //-------------------------------------------------------------------------------------//

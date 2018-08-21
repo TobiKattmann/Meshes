@@ -1,3 +1,4 @@
+#! /share/fe00fx11/anaconda/4.3.0-python3.6/bin/python3.6
 # Kattmann, 05.2018, python 3.6
 #
 # Requires: .su2 meshes for each zone in current dir

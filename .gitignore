@@ -1,2 +1,3 @@
-# meshes in .su2 format
+# meshes in .su2, .msh format
 *.su2
+*.msh
