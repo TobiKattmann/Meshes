@@ -11,11 +11,11 @@
 import subprocess
 #-------------------------------------------------------------------#
 # enter the names of .geo files here, without .geo -ending
-geo_files = ['2d-90bend']
+geo_files = ['2d-square-cylinder']
 #geo_files = ['channel_only','top_block_only']
 #geo_files = ['channel_only','bottom_block_only']
 # output filename
-out_mesh_name = '2d-90bend.su2'
+out_mesh_name = '2d-square-cylinder.su2'
 # mesh dimension
 ndim = 2
 create_zone_meshes = True

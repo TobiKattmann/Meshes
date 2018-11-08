@@ -8,9 +8,9 @@ mesh_radius = 20 * cylinder_diameter;
 
 //Mesh inputs
 gridsize = 0.01;
-Ncylinder = 310/2;
-Nradial = 104;
-Rradial = 1.1;
+Ncylinder = 202/2;
+Nradial = 112;
+Rradial = 1.06;
 
 //-------------------------------------------------------------------------------------//
 // Geometry definition
@@ -20,6 +20,9 @@ Point(2) = {-cylinder_radius, 0, 0, gridsize};
 Point(3) = {cylinder_radius, 0, 0, gridsize};
 Point(4) = {mesh_radius, 0, 0, gridsize};
 Point(5) = {0, 0, 0, gridsize};
+
+//helping point to know height of first layer
+//Point(6) = {-cylinder_radius - 0.002, 0, 0, gridsize};
 
 // Lines
 Line(1) = {1, 2}; // to the left

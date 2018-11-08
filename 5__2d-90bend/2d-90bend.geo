@@ -77,4 +77,6 @@ Physical Line("outlet") = {6};
 Physical Line("bend") = {9,10};
 Physical Line("in_pipe") = {2,4};
 Physical Line("out_pipe") = {5,7};
+Physical Surface("fluid") = {1,2,3};
+
 
