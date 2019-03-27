@@ -1,0 +1,186 @@
+//Kattmann, 13.05.2018, Channel with 1 Pin
+//-------------------------------------------------------------------------------------//
+//Geometric inputs, ch: channel, Pin center is origin
+//ch_height > pin_outer_r + ch_box
+ch_height = 2e-3 *5e2;
+//ch_front & ch_back > pin_outer_r + ch_box
+ch_front = 3e-3 *5e2; // front length
+ch_back = 5e-3 *5e2; // back length
+ch_box = 0.5e-3 *5e2; // for extension of pin mesh
+
+pin_outer_r = 1e-3 *5e2;
+pin_inner_r = 0.25e-3 *5e2;
+
+//Mesh inputs
+gridsize = 0.1; // unimportant one everything is structured
+
+//ch_box 
+Nch_box = 30;
+Rch_box = 1.1;
+
+Nch_front = 30;
+Nch_back = 60;
+
+//upper wall
+Nupper_wall = 20;
+Rupper_wall = 1.1;
+
+//Pin in radial direction
+Npin_radial = 80; // for all pin segments
+Rpin_radial = 1.;
+//Pin in circumferential direction
+Npin1_circ = 40; 
+Npin2_circ = 2*Npin1_circ;
+Npin3_circ = Npin1_circ;
+
+//-------------------------------------------------------------------------------------//
+//Fluid zone
+//Points
+Point(1) = {0 +pin_outer_r , 0, 0, gridsize};
+Point(2) = {-pin_outer_r +pin_outer_r, 0, 0, gridsize};
+Point(3) = {-pin_outer_r*Cos(45*Pi/180) +pin_outer_r, pin_outer_r*Sin(45*Pi/180), 0, gridsize};
+Point(4) = {pin_outer_r*Cos(45*Pi/180) +pin_outer_r, pin_outer_r*Sin(45*Pi/180), 0, gridsize};
+Point(5) = {pin_outer_r +pin_outer_r, 0, 0, gridsize};
+
+Point(6) = {-(pin_outer_r+ch_box) +pin_outer_r, 0, 0, gridsize};
+Point(7) = {-(pin_outer_r+ch_box) +pin_outer_r, pin_outer_r+ch_box, 0, gridsize};
+Point(8) = {pin_outer_r+ch_box +pin_outer_r, pin_outer_r+ch_box, 0, gridsize};
+Point(9) = {pin_outer_r+ch_box +pin_outer_r, 0, 0, gridsize};
+
+Point(10) = {-ch_front +pin_outer_r, 0, 0, gridsize};
+Point(11) = {-ch_front +pin_outer_r, pin_outer_r+ch_box, 0, gridsize};
+Point(12) = {-ch_front +pin_outer_r, ch_height, 0, gridsize};
+Point(13) = {-(pin_outer_r+ch_box) +pin_outer_r, ch_height, 0, gridsize};
+Point(14) = {(pin_outer_r+ch_box) +pin_outer_r, ch_height, 0, gridsize};
+Point(15) = {ch_back +pin_outer_r, ch_height, 0, gridsize};
+Point(16) = {ch_back +pin_outer_r, pin_outer_r+ch_box, 0, gridsize};
+Point(17) = {ch_back +pin_outer_r, 0, 0, gridsize};
+
+//Lines
+Circle(1) = {2, 1, 3};
+Circle(2) = {3, 1, 4};
+Circle(3) = {4, 1, 5};
+
+Line(4) = {6,2};
+Line(5) = {10,6};
+Line(6) = {10,11};
+Line(7) = {11,12};
+Line(8) = {12,13};
+Line(9) = {11,7};
+Line(10) = {13,7};
+Line(11) = {6,7};
+Line(12) = {7,3};
+Line(13) = {13,14};
+Line(14) = {7,8};
+Line(15) = {8,4};
+Line(16) = {5,9};
+Line(17) = {9,8};
+Line(18) = {14,8};
+Line(19) = {14,15};
+Line(20) = {8,16};
+Line(21) = {9,17};
+Line(22) = {17,16};
+Line(23) = {15,16};
+
+//Lineloops and surfaces
+Line Loop(1) = {-4, 11, 12, -1};
+Plane Surface(1) = {1};
+
+Line Loop(2) = {-2, -12, 14, 15};
+Plane Surface(2) = {2};
+
+Line Loop(3) = {-16, -3, -15, -17};
+Plane Surface(3) = {3};
+
+Line Loop(4) = {-5, 6, 9, -11};
+Plane Surface(4) = {4};
+
+Line Loop(5) = {-9, 7, 8, 10};
+Plane Surface(5) = {5};
+
+Line Loop(6) = {-14, -10, 13, 18};
+Plane Surface(6) = {6};
+
+Line Loop(7) = {-20, -18, 19, 23};
+Plane Surface(7) = {7};
+
+Line Loop(8) = {-21, 17, 20, -22};
+Plane Surface(8) = {8};
+
+//make structured mesh with transfinite lines
+//ch_box
+Transfinite Line{1, 11, 6} = Npin1_circ;
+Transfinite Line{2, 14, 13} = Npin2_circ;
+Transfinite Line{3, -17, -22} = Npin3_circ;
+Transfinite Line{-4, -12, -15, 16} = Nch_box Using Progression Rch_box;
+//
+Transfinite Line{-7, 10, 18, 23} = Nupper_wall Using Progression Rupper_wall;
+Transfinite Line{5, 9, 8} = Nch_front;
+Transfinite Line{21, 20, 19} = Nch_back;
+
+Transfinite Surface{1,2,3,4,5,6,7,8};
+Recombine Surface{1,2,3,4,5,6,7,8};
+
+//Physical Groups, outlet handeled below
+Physical Line("inlet") = {6, 7};
+Physical Line("outlet") = {22, 23};
+Physical Line("fluid_top") = {8, 13, 19};
+Physical Line("fluid_pin_interface") = {1, 2, 3};
+Physical Line("fluid_sym") = {5, 4, 16, 21};
+Physical Surface("fluid_body") = {1,2,3,4,5,6,7,8};
+
+Mesh 2;
+
+///-------------------------------------------------------------------------------------//
+///Translation in streamwise direction
+//umber_duplicates = 30;
+//
+//f (number_duplicates == 0) 
+//   Physical Line("outlet") = {22, 23};
+//ndIf
+//
+///Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
+//[] = Point "*";
+//[] = Line "*";
+//[] = Surface "*";
+//
+///Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
+//eometry.AutoCoherence = 1;
+///Keep meshing iformation on duplicated domain https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
+//eometry.CopyMeshingMethod = 1;
+//
+//
+///Note that for some lines the prescribed Progression of the Transfinite Line is not CopyMeshingMethod
+///correctly. Simply reversing the Line orientation (i.e. switching points) and reversing the sign in the
+///following definition fixes the problem.
+//or i In {1:number_duplicates}
+//
+//   // Translate all points 
+//	Translate {i*0.008, 0, 0} { Duplicata { Point{ p[] }; } }
+//
+//   // Translate Lines: fluid_top, fluid_pin_interface, fluid_sym and add to Physical Tag name
+//   new_fluid_top[] = Translate {i*0.008, 0, 0} { Duplicata { Line{ 8, 13, 19 }; } };
+//   Physical Line("fluid_top") += { new_fluid_top[] };
+//
+//   new_fluid_pin_interface[] = Translate {i*0.008, 0, 0} { Duplicata { Line { 1, 2, 3 }; } };
+//   Physical Line("fluid_pin_interface") += { new_fluid_pin_interface[] };
+//
+//   new_fluid_sym[] = Translate {i*0.008, 0, 0} { Duplicata { Line{ 5, 4, 16, 21 }; } };
+//   Physical Line("fluid_sym") += { new_fluid_sym[] };
+//
+//   //If it is the last copy, set the outlet marker
+//   If (i == number_duplicates)
+//       Printf("Hallo");
+//       new_outlet[] = Translate {i*0.008, 0, 0} { Duplicata { Line { 22, 23 }; } };
+//       Printf("Lines: %g , %g", new_outlet[0], new_outlet[1] );
+//       Physical Line("outlet") = { new_outlet[] };
+//   EndIf
+//
+//   //Translate Surface: fluid_body and add to Physical Tag name
+//   new_fluid_body[] = Translate {i*0.008, 0, 0} { Duplicata { Surface{ 1,2,3,4,5,6,7,8 }; } };
+//   Physical Surface("fluid_body") += { new_fluid_body[] };
+//
+//ndFor
+//
+///Mesh the case, only viable for debugging in gui, real mesh generation via command line tool
+///Mesh 2;

@@ -67,41 +67,41 @@ Line(6) = {10,11};
 Line(7) = {11,12};
 Line(8) = {12,13};
 Line(9) = {11,7};
-Line(10) = {7,13};
+Line(10) = {13,7};
 Line(11) = {6,7};
 Line(12) = {7,3};
 Line(13) = {13,14};
 Line(14) = {7,8};
-Line(15) = {4,8};
+Line(15) = {8,4};
 Line(16) = {5,9};
 Line(17) = {9,8};
-Line(18) = {8,14};
+Line(18) = {14,8};
 Line(19) = {14,15};
 Line(20) = {8,16};
 Line(21) = {9,17};
 Line(22) = {17,16};
-Line(23) = {16,15};
+Line(23) = {15,16};
 
 //Lineloops and surfaces
 Line Loop(1) = {-4, 11, 12, -1};
 Plane Surface(1) = {1};
 
-Line Loop(2) = {-2, -12, 14, -15};
+Line Loop(2) = {-2, -12, 14, 15};
 Plane Surface(2) = {2};
 
-Line Loop(3) = {-16, -3, 15, -17};
+Line Loop(3) = {-16, -3, -15, -17};
 Plane Surface(3) = {3};
 
 Line Loop(4) = {-5, 6, 9, -11};
 Plane Surface(4) = {4};
 
-Line Loop(5) = {-9, 7, 8, -10};
+Line Loop(5) = {-9, 7, 8, 10};
 Plane Surface(5) = {5};
 
-Line Loop(6) = {-14, 10, 13, -18};
+Line Loop(6) = {-14, -10, 13, 18};
 Plane Surface(6) = {6};
 
-Line Loop(7) = {-20, 18, 19, -23};
+Line Loop(7) = {-20, -18, 19, 23};
 Plane Surface(7) = {7};
 
 Line Loop(8) = {-21, 17, 20, -22};
@@ -112,20 +112,73 @@ Plane Surface(8) = {8};
 Transfinite Line{1, 11, 6} = Npin1_circ;
 Transfinite Line{2, 14, 13} = Npin2_circ;
 Transfinite Line{3, -17, -22} = Npin3_circ;
-Transfinite Line{-4, -12, 15, 16} = Nch_box Using Progression Rch_box;
+Transfinite Line{-4, -12, -15, 16} = Nch_box Using Progression Rch_box;
 //
-Transfinite Line{-7, -10, -18, -23} = Nupper_wall Using Progression Rupper_wall;
+Transfinite Line{-7, 10, 18, 23} = Nupper_wall Using Progression Rupper_wall;
 Transfinite Line{5, 9, 8} = Nch_front;
 Transfinite Line{21, 20, 19} = Nch_back;
 
 Transfinite Surface{1,2,3,4,5,6,7,8};
 Recombine Surface{1,2,3,4,5,6,7,8};
 
-//Physical Groups
+//Physical Groups, outlet handeled below
 Physical Line("inlet") = {6, 7};
-Physical Line("outlet") = {22, 23};
+//Physical Line("outlet") = {22, 23};
 Physical Line("fluid_top") = {8, 13, 19};
 Physical Line("fluid_pin_interface") = {1, 2, 3};
 Physical Line("fluid_sym") = {5, 4, 16, 21};
 Physical Surface("fluid_body") = {1,2,3,4,5,6,7,8};
+
 //-------------------------------------------------------------------------------------//
+//Translation in streamwise direction
+number_duplicates = 30;
+
+If (number_duplicates == 0) 
+    Physical Line("outlet") = {22, 23};
+EndIf
+
+//Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
+p[] = Point "*";
+l[] = Line "*";
+s[] = Surface "*";
+
+//Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
+Geometry.AutoCoherence = 1;
+//Keep meshing iformation on duplicated domain https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
+Geometry.CopyMeshingMethod = 1;
+
+
+//Note that for some lines the prescribed Progression of the Transfinite Line is not CopyMeshingMethod
+//correctly. Simply reversing the Line orientation (i.e. switching points) and reversing the sign in the
+//following definition fixes the problem.
+For i In {1:number_duplicates}
+
+    // Translate all points 
+	Translate {i*0.008, 0, 0} { Duplicata { Point{ p[] }; } }
+
+    // Translate Lines: fluid_top, fluid_pin_interface, fluid_sym and add to Physical Tag name
+    new_fluid_top[] = Translate {i*0.008, 0, 0} { Duplicata { Line{ 8, 13, 19 }; } };
+    Physical Line("fluid_top") += { new_fluid_top[] };
+
+    new_fluid_pin_interface[] = Translate {i*0.008, 0, 0} { Duplicata { Line { 1, 2, 3 }; } };
+    Physical Line("fluid_pin_interface") += { new_fluid_pin_interface[] };
+
+    new_fluid_sym[] = Translate {i*0.008, 0, 0} { Duplicata { Line{ 5, 4, 16, 21 }; } };
+    Physical Line("fluid_sym") += { new_fluid_sym[] };
+
+    //If it is the last copy, set the outlet marker
+    If (i == number_duplicates)
+        Printf("Hallo");
+        new_outlet[] = Translate {i*0.008, 0, 0} { Duplicata { Line { 22, 23 }; } };
+        Printf("Lines: %g , %g", new_outlet[0], new_outlet[1] );
+        Physical Line("outlet") = { new_outlet[] };
+    EndIf
+
+    //Translate Surface: fluid_body and add to Physical Tag name
+    new_fluid_body[] = Translate {i*0.008, 0, 0} { Duplicata { Surface{ 1,2,3,4,5,6,7,8 }; } };
+    Physical Surface("fluid_body") += { new_fluid_body[] };
+
+EndFor
+
+//Mesh the case, only viable for debugging in gui, real mesh generation via command line tool
+//Mesh 2;

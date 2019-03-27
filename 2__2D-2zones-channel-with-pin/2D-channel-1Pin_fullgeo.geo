@@ -193,3 +193,21 @@ Physical Line("pin_fluid_interface") = {32, 35, 38};
 Physical Line("pin_sym") = {31, 39};
 Physical Line("pin_inner") = {34, 36, 40};
 Physical Surface("pin_body") = {31, 32, 33};
+
+////Translation in streamwise direction
+//number_duplicates = 2;
+////Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
+//p[] = Point "*";
+//l[] = Line "*";
+//s[] = Surface "*";
+////Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
+//Geometry.AutoCoherence = 1;
+////Keep meshing iformation on duplicated domain https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
+//Geometry.CopyMeshingMethod = 1;
+//
+//For i In {1:number_duplicates}
+//	Translate {i*0.008, 0, 0} { Duplicata { Point{ p[] }; Line{ l[] }; Surface{ s[] }; } }
+//EndFor
+
+
+
