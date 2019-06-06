@@ -12,7 +12,7 @@ pin_outer_r = 1e-3;
 pin_inner_r = 0.25e-3;
 
 //Mesh inputs
-gridsize = 0.1; // unimportant one everything is structured
+gridsize = 0.1; // unimportant once everything is structured
 
 //ch_box 
 Nch_box = 30;
