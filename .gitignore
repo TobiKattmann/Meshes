@@ -1,3 +1,7 @@
-# meshes in .su2, .msh format
+# meshes in .su2, .msh, .neu format
 *.su2
 *.msh
+*.neu
+
+# visual studio code folder
+.vscode*
