@@ -2,7 +2,7 @@
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 1;// 0=Fluid, 1=Solid, 2=both
+Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
@@ -46,10 +46,10 @@ Line Loop(2) = {4, 5, 7, 3}; Plane Surface(2) = {2};
 Transfinite Line{1,7,4} = Ny;
 Transfinite Line{2,6,3,5} = Nx;
 
-If (Which_Mesh_Part == 0) // fluid
+If (Which_Mesh_Part == 1) // fluid
     Physical Surface("interface_1_fluid") = {1};
     Physical Surface("interface_2_fluid") = {2};
-ElseIf (Which_Mesh_Part == 1) // solid
+ElseIf (Which_Mesh_Part == 2) // solid
     Physical Surface("interface_1_solid") = {1};
     Physical Surface("interface_2_solid") = {2};
 Else // whole mesh
@@ -59,7 +59,7 @@ EndIf
 
 // ------------------------------------------------------------------------- //
 // Fluid mesh
-If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
+If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
 
     Point(11) = {0, 0, upper_h, gridsize};
     Point(12) = {0, width, upper_h, gridsize};
@@ -114,7 +114,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 EndIf
 // ------------------------------------------------------------------------- //
 // Solid mesh
-If (Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
+If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
     Point(31) = {0, 0, -lower_h, gridsize};
     Point(32) = {0, width, -lower_h, gridsize};
@@ -168,6 +168,7 @@ If (Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
 
 EndIf
 
+// ------------------------------------------------------------------------- //
 // Meshing
 Transfinite Surface "*";
 Recombine Surface "*";
@@ -177,13 +178,14 @@ If (Do_Meshing == 1)
     Mesh 1; Mesh 2; Mesh 3;
 EndIf
 
+// ------------------------------------------------------------------------- //
 // Write .su2 meshfile
 If (Write_mesh == 1)
 
     Mesh.Format = 42; // .su2 mesh format, 
-    If (Which_Mesh_Part == 0)
+    If (Which_Mesh_Part == 1)
         Save "fluid.su2";
-    ElseIf (Which_Mesh_Part == 1)
+    ElseIf (Which_Mesh_Part == 2)
         Save "solid.su2";
     Else
         Printf("Unvalid Which_Mesh_Part variable.");

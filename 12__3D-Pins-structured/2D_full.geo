@@ -2,8 +2,12 @@
 // ------------------------------------------------------------------------- //
 // Geometric inputs in [mm]
 
-// Print Fluid(0) or Solid(1) domain mesh (2)
-Which_Mesh2Write= 1;
+// Which domain part should be handled
+Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
+// Evoque Meshing Algorithm?
+Do_Meshing= 1; // 0=false, 1=true
+// Write Mesh files in .su2 format
+Write_mesh= 0; // 0=false, 1=true
 
 // Free parameters
 dist= 6.44; // distance between pin midpoints, each pin has 6 surrounding pins, i.e. 60 deg between each
@@ -35,7 +39,22 @@ Printf("===================================");
 
 // Mesh inputs
 scale_factor =1; // scales Point positions from [mm] to [m] with 1e-3
-gs = 2 *scale_factor; 
+gs = 2 *scale_factor; // gridsize
+
+// interface meshing parameteres. Also sufficient for fluid domain meshing.
+N_x_flow= 20; // #gridpoints in flow x-direction on a patch. Also N_x_flow/2 on smaller patches employed.
+
+N_y_flow = 15; // #gridpoints normal to pin surface, y-direction
+R_y_flow= 1.1; // Progression normal to pin surface
+
+N_z_flow= 50; // #gridpoints in height z-direction
+R_z_flow= 0.1; // Bump in height as top and bottom are walls
+
+// Additional meshing parameters for solid domain
+InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1. 
+N_y_innerPin= 10; // #gridpoints of the structured first part of the inner Pin in y-direction / normal to the pin
+R_y_innerPin= 0.9; // Progression towards interface
+
 
 // Feasability checks
 If (r_pin_lower >= width || 
@@ -122,12 +141,9 @@ Line Loop(15) = {53, 54, 31, 46}; Plane Surface(15) = {15};
 Line Loop(16) = {44, 45, 30, -54}; Plane Surface(16) = {16};
 
 // No progression in flow direction on the pin surface
-N_x_flow= 20;
 Transfinite Line {11,50,20,47,21,22,53,31} = N_x_flow;
 Transfinite Line {10,41,30,44} = N_x_flow/2;
 // Progression normal to the pin surface
-N_y_flow = 20;
-R_y_flow= 1.1;
 Transfinite Line {40, -49, -48, -42, 51, 52, -43, 46, -54, -45} = N_y_flow Using Progression R_y_flow; 
 
 // Upper Pin1
@@ -182,8 +198,6 @@ Line Loop(24) = {74, -(22+100), -73, 22}; Surface(24) = {24};
 Line Loop(25) = {83, -(31+100), -82, 31}; Surface(25) = {25};
 Line Loop(26) = {82, -(30+100), -81, 30}; Surface(26) = {26};
 
-N_z_flow= 50;
-R_z_flow= 0.1;
 Transfinite Line {11+100,20+100,21+100,22+100,31+100} = N_x_flow;
 Transfinite Line {10+100,30+100} = N_x_flow/2;
 Transfinite Line {61,62,63,71,72,73,74,81,82,83} = N_z_flow Using Bump R_z_flow;
@@ -198,169 +212,165 @@ Physical Surface("pin2") = {24, 23, 22};
 Physical Surface("pin3") = {25, 26};
 
 // ------------------------------------------------------------------------- //
-If (Which_Mesh2Write == 0)
-// Fluid only description
-// upper additional structured mesh points
-Point(40+100) = {length/4 + Tan(30*rad2deg)*width/2, width, upper_h, gs}; // first half, large y
-Point(41+100) = {length/4 - Tan(30*rad2deg)*width/2, 0, upper_h, gs}; // first half, small y
-Point(42+100) = {length*3/4 - Tan(30*rad2deg)*width/2, width, upper_h, gs}; // second half, large y
-Point(43+100) = {length*3/4 + Tan(30*rad2deg)*width/2, 0, upper_h, gs}; // second half, small y
-Point(44+100) = {0, 0, upper_h, gs}; // corner point inlet
-Point(45+100) = {length, 0, upper_h, gs}; // corner point outlet
+If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
+    // Fluid only description
+    // upper additional structured mesh points
+    Point(40+100) = {length/4 + Tan(30*rad2deg)*width/2, width, upper_h, gs}; // first half, large y
+    Point(41+100) = {length/4 - Tan(30*rad2deg)*width/2, 0, upper_h, gs}; // first half, small y
+    Point(42+100) = {length*3/4 - Tan(30*rad2deg)*width/2, width, upper_h, gs}; // second half, large y
+    Point(43+100) = {length*3/4 + Tan(30*rad2deg)*width/2, 0, upper_h, gs}; // second half, small y
+    Point(44+100) = {0, 0, upper_h, gs}; // corner point inlet
+    Point(45+100) = {length, 0, upper_h, gs}; // corner point outlet
 
-// upper additional structured mesh lines
-// outer boundary
-Line(40+100) = {11+100, 44+100};
-Line(41+100) = {44+100, 41+100};
-Line(42+100) = {41+100, 21+100};
-Line(43+100) = {43+100, 24+100};
-Line(44+100) = {43+100, 45+100};
-Line(45+100) = {45+100, 31+100};
-Line(46+100) = {33+100, 42+100};
-Line(47+100) = {42+100, 40+100};
-Line(48+100) = {40+100, 13+100};
-// inner lines
-Line(49+100) = {41+100, 12+100};
-Line(50+100) = {41+100, 40+100};
-Line(51+100) = {22+100, 40+100};
-Line(52+100) = {23+100, 42+100};
-Line(53+100) = {42+100, 43+100};
-Line(54+100) = {43+100, 32+100};
+    // upper additional structured mesh lines
+    // outer boundary
+    Line(40+100) = {11+100, 44+100};
+    Line(41+100) = {44+100, 41+100};
+    Line(42+100) = {41+100, 21+100};
+    Line(43+100) = {43+100, 24+100};
+    Line(44+100) = {43+100, 45+100};
+    Line(45+100) = {45+100, 31+100};
+    Line(46+100) = {33+100, 42+100};
+    Line(47+100) = {42+100, 40+100};
+    Line(48+100) = {40+100, 13+100};
+    // inner lines
+    Line(49+100) = {41+100, 12+100};
+    Line(50+100) = {41+100, 40+100};
+    Line(51+100) = {22+100, 40+100};
+    Line(52+100) = {23+100, 42+100};
+    Line(53+100) = {42+100, 43+100};
+    Line(54+100) = {43+100, 32+100};
 
-// line loops and surfaces on lower domain interface
-Line Loop(10+100) = {40+100, 41+100, 49+100, -(10+100)}; Plane Surface(10+100) = {10+100};
-Line Loop(11+100) = {-(49+100), 50+100, 48+100, -(11+100)}; Plane Surface(11+100) = {11+100};
-Line Loop(12+100) = {42+100, 20+100, 51+100, -(50+100)}; Plane Surface(12+100) = {12+100};
-Line Loop(13+100) = {-(51+100), 21+100, 52+100, 47+100}; Plane Surface(13+100) = {13+100};
-Line Loop(14+100) = {53+100, 43+100, -(22+100), 52+100}; Plane Surface(14+100) = {14+100};
-Line Loop(15+100) = {53+100, 54+100, 31+100, 46+100}; Plane Surface(15+100) = {15+100};
-Line Loop(16+100) = {44+100, 45+100, 30+100, -(54+100)}; Plane Surface(16+100) = {16+100};
+    // line loops and surfaces on lower domain interface
+    Line Loop(10+100) = {40+100, 41+100, 49+100, -(10+100)}; Plane Surface(10+100) = {10+100};
+    Line Loop(11+100) = {-(49+100), 50+100, 48+100, -(11+100)}; Plane Surface(11+100) = {11+100};
+    Line Loop(12+100) = {42+100, 20+100, 51+100, -(50+100)}; Plane Surface(12+100) = {12+100};
+    Line Loop(13+100) = {-(51+100), 21+100, 52+100, 47+100}; Plane Surface(13+100) = {13+100};
+    Line Loop(14+100) = {53+100, 43+100, -(22+100), 52+100}; Plane Surface(14+100) = {14+100};
+    Line Loop(15+100) = {53+100, 54+100, 31+100, 46+100}; Plane Surface(15+100) = {15+100};
+    Line Loop(16+100) = {44+100, 45+100, 30+100, -(54+100)}; Plane Surface(16+100) = {16+100};
 
-// No progression in flow direction on the pin surface
-N_x_flow= 20;
-Transfinite Line {50+100,47+100,53+100} = N_x_flow;
-Transfinite Line {41+100,44+100} = N_x_flow/2;
-// Progression normal to the pin surface
-N_y_flow = 15;
-R_y_flow= 1.1;
-Transfinite Line {40+100, -(49+100), -(48+100), -(42+100), 51+100, 52+100, -(43+100), 46+100, -(54+100), -(45+100)} = N_y_flow Using Progression R_y_flow;
+    // No progression in flow direction on the pin surface
+    Transfinite Line {50+100,47+100,53+100} = N_x_flow;
+    Transfinite Line {41+100,44+100} = N_x_flow/2;
+    // Progression normal to the pin surface
+    Transfinite Line {40+100, -(49+100), -(48+100), -(42+100), 51+100, 52+100, -(43+100), 46+100, -(54+100), -(45+100)} = N_y_flow Using Progression R_y_flow;
 
-// Side Faces on the outside of the domain
-// additional lines in z-direction on fluid boundary
-Line(160) = {44, 144};
-Line(161) = {41, 141};
-Line(162) = {43, 143};
-Line(163) = {45, 145};
-Line(164) = {42, 142};
-Line(165) = {40, 140};
-Transfinite Line {160,161,162,163,164,165} = N_z_flow Using Bump 0.1;
+    // Side Faces on the outside of the domain
+    // additional lines in z-direction on fluid boundary
+    Line(160) = {44, 144};
+    Line(161) = {41, 141};
+    Line(162) = {43, 143};
+    Line(163) = {45, 145};
+    Line(164) = {42, 142};
+    Line(165) = {40, 140};
+    Transfinite Line {160,161,162,163,164,165} = N_z_flow Using Bump 0.1;
 
-// Side-faces
-Line Loop(117) = {61, 140, -160, -40}; Surface(117) = {117};
-Line Loop(118) = {160, 141, -161, -41}; Surface(118) = {118};
-Line Loop(119) = {161, 142, -71, -42}; Surface(119) = {119};
-Line Loop(120) = {74, -143, -162, 43}; Surface(120) = {120};
-Line Loop(121) = {162, 144, -163, -44}; Surface(121) = {121};
-Line Loop(122) = {163, 145, -81, -45}; Surface(122) = {122};
-Line Loop(123) = {83, 146, -164, -46}; Surface(123) = {123};
-Line Loop(124) = {164, 147, -165, -47}; Surface(124) = {124};
-Line Loop(125) = {165, 148, -63, -48}; Surface(125) = {125};
+    // Side-faces
+    Line Loop(117) = {61, 140, -160, -40}; Surface(117) = {117};
+    Line Loop(118) = {160, 141, -161, -41}; Surface(118) = {118};
+    Line Loop(119) = {161, 142, -71, -42}; Surface(119) = {119};
+    Line Loop(120) = {74, -143, -162, 43}; Surface(120) = {120};
+    Line Loop(121) = {162, 144, -163, -44}; Surface(121) = {121};
+    Line Loop(122) = {163, 145, -81, -45}; Surface(122) = {122};
+    Line Loop(123) = {83, 146, -164, -46}; Surface(123) = {123};
+    Line Loop(124) = {164, 147, -165, -47}; Surface(124) = {124};
+    Line Loop(125) = {165, 148, -63, -48}; Surface(125) = {125};
 
-// Internal fluid faces
-Line Loop(126) = {62, -149, -161, 49}; Surface(126) = {126};
-Line Loop(127) = {165, -150, -161, 50}; Surface(127) = {127};
-Line Loop(128) = {165, -151, -72, 51}; Surface(128) = {128};
-Line Loop(129) = {164, -152, -73, 52}; Surface(129) = {129};
-Line Loop(130) = {164, 153, -162, -53}; Surface(130) = {130};
-Line Loop(131) = {82, -154, -162, 54}; Surface(131) = {131};
+    // Internal fluid faces
+    Line Loop(126) = {62, -149, -161, 49}; Surface(126) = {126};
+    Line Loop(127) = {165, -150, -161, 50}; Surface(127) = {127};
+    Line Loop(128) = {165, -151, -72, 51}; Surface(128) = {128};
+    Line Loop(129) = {164, -152, -73, 52}; Surface(129) = {129};
+    Line Loop(130) = {164, 153, -162, -53}; Surface(130) = {130};
+    Line Loop(131) = {82, -154, -162, 54}; Surface(131) = {131};
 
-// Definition
-Surface Loop(1) = {110, 117, 20, 10, 118, 126}; Volume(1) = {1};
-Surface Loop(2) = {111, 125, 21, 11, 126, 127}; Volume(2) = {2};
-Surface Loop(3) = {112, 119, 22, 12, 127, 128}; Volume(3) = {3};
-Surface Loop(4) = {113, 23, 13, 124, 128, 129}; Volume(4) = {4};
-Surface Loop(5) = {114, 120, 24, 14, 129, 130}; Volume(5) = {5};
-Surface Loop(6) = {115, 25, 123, 15, 130, 131}; Volume(6) = {6};
-Surface Loop(7) = {116, 121, 122, 26, 16, 131}; Volume(7) = {7};
+    // Definition
+    Surface Loop(1) = {110, 117, 20, 10, 118, 126}; Volume(1) = {1};
+    Surface Loop(2) = {111, 125, 21, 11, 126, 127}; Volume(2) = {2};
+    Surface Loop(3) = {112, 119, 22, 12, 127, 128}; Volume(3) = {3};
+    Surface Loop(4) = {113, 23, 13, 124, 128, 129}; Volume(4) = {4};
+    Surface Loop(5) = {114, 120, 24, 14, 129, 130}; Volume(5) = {5};
+    Surface Loop(6) = {115, 25, 123, 15, 130, 131}; Volume(6) = {6};
+    Surface Loop(7) = {116, 121, 122, 26, 16, 131}; Volume(7) = {7};
 
-Transfinite Surface "*";
-Recombine Surface "*";
-Transfinite Volume "*";
+    Transfinite Surface "*";
+    Recombine Surface "*";
+    Transfinite Volume "*";
 
-//Physical Tags
-Physical Volume("fluid_volume") = {1, 2, 3, 4, 5, 7, 6};
-Physical Surface("top_fluid") = {110, 111, 112, 113, 114, 115, 116};
-Physical Surface("inlet_fluid") = {117};
-Physical Surface("outlet_fluid") = {122};
-Physical Surface("sym_sides_fluid") = {119, 118, 120, 121, 123, 124, 125};
+    //Physical Tags
+    Physical Volume("fluid_volume") = {1, 2, 3, 4, 5, 7, 6};
+    Physical Surface("top_fluid") = {110, 111, 112, 113, 114, 115, 116};
+    Physical Surface("inlet_fluid") = {117};
+    Physical Surface("outlet_fluid") = {122};
+    Physical Surface("sym_sides_fluid") = {119, 118, 120, 121, 123, 124, 125};
+
 EndIf
 // ------------------------------------------------------------------------- //
 // Solid only description
-If (Which_Mesh2Write == 1)
-// 200-er range reserved for 2nd copy of bottom interface mesh
+If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
+    // 200-er range reserved for 2nd copy of bottom interface mesh
 
-// Solid inner pin and bottom300-er range
-InnerRadiusFactor= 0.5;
-// pin 1 lower 
-Point(301) = {InnerRadiusFactor*0, width-r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 on inlet
-Point(302) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_lower, width-Cos(30*rad2deg)*r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 in between
-Point(303) = {InnerRadiusFactor*r_pin_lower, width, 0, gs}; // lower pin1 on sym
-Circle(301) = {301,10,302};
-Circle(302) = {302,10,303};
+    // Solid inner pin and bottom300-er range
+    // pin 1 lower 
+    Point(301) = {InnerRadiusFactor*0, width-r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 on inlet
+    Point(302) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_lower, width-Cos(30*rad2deg)*r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 in between
+    Point(303) = {InnerRadiusFactor*r_pin_lower, width, 0, gs}; // lower pin1 on sym
+    Circle(301) = {301,10,302};
+    Circle(302) = {302,10,303};
 
-// pin 1 upper
-Point(304) = {InnerRadiusFactor*0, width-r_pin_upper*InnerRadiusFactor, upper_h, gs}; // lower pin1 on inlet
-Point(305) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_upper, width-Cos(30*rad2deg)*r_pin_upper*InnerRadiusFactor, upper_h, gs}; // lower pin1 in between
-Point(306) = {InnerRadiusFactor*r_pin_upper, width, upper_h, gs}; // lower pin1 on sym
-Circle(303) = {304,110,305};
-Circle(304) = {305,110,306};
+    // pin 1 upper
+    Point(304) = {InnerRadiusFactor*0, width-r_pin_upper*InnerRadiusFactor, upper_h, gs}; // lower pin1 on inlet
+    Point(305) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_upper, width-Cos(30*rad2deg)*r_pin_upper*InnerRadiusFactor, upper_h, gs}; // lower pin1 in between
+    Point(306) = {InnerRadiusFactor*r_pin_upper, width, upper_h, gs}; // lower pin1 on sym
+    Circle(303) = {304,110,305};
+    Circle(304) = {305,110,306};
 
-// pin 1 additional lines
-Line(305) = {10, 301};
-Line(306) = {301, 11};
-Line(307) = {10, 303};
-Line(308) = {303, 13};
-Line(309) = {110, 304};
-Line(310) = {304, 111};
-Line(311) = {110, 306};
-Line(312) = {306, 113};
-Line(317) = {305, 112};
-Line(318) = {302, 12};
+    // pin 1 additional lines
+    Line(305) = {10, 301};
+    Line(306) = {301, 11};
+    Line(307) = {10, 303};
+    Line(308) = {303, 13};
+    Line(309) = {110, 304};
+    Line(310) = {304, 111};
+    Line(311) = {110, 306};
+    Line(312) = {306, 113};
+    Line(317) = {305, 112};
+    Line(318) = {302, 12};
 
-// pin1 in z-direction
-Line(313) = {301, 304};
-Line(314) = {302, 305};
-Line(315) = {303, 306};
-Line(316) = {10, 110};
+    // pin1 in z-direction
+    Line(313) = {301, 304};
+    Line(314) = {302, 305};
+    Line(315) = {303, 306};
+    Line(316) = {10, 110};
 
-// pin1 Line loop and surface definition
-Line Loop(27) = {313, 310, -61, -306}; Plane Surface(27) = {27};
-Line Loop(28) = {316, 309, -313, -305}; Plane Surface(28) = {28};
-Line Loop(29) = {315, -311, -316, 307}; Plane Surface(29) = {29};
-Line Loop(30) = {315, -304, -314, 302}; Surface(30) = {30};
-Line Loop(31) = {314, -303, -313, 301}; Surface(31) = {31};
-Line Loop(32) = {308, -11, -318, 302}; Plane Surface(32) = {32};
-Line Loop(33) = {318, -10, -306, 301}; Plane Surface(33) = {33};
-Line Loop(34) = {307, -302, -301, -305}; Plane Surface(34) = {34};
-Line Loop(35) = {304, 312, -111, -317}; Plane Surface(35) = {35};
-Line Loop(36) = {317, -110, -310, 303}; Plane Surface(36) = {36};
-Line Loop(37) = {311, -304, -303, -309}; Plane Surface(37) = {37};
-Line Loop(38) = {63, -312, -315, 308}; Plane Surface(38) = {38};
+    // pin1 Line loop and surface definition
+    Line Loop(27) = {313, 310, -61, -306}; Plane Surface(27) = {27};
+    Line Loop(28) = {316, 309, -313, -305}; Plane Surface(28) = {28};
+    Line Loop(29) = {315, -311, -316, 307}; Plane Surface(29) = {29};
+    Line Loop(30) = {315, -304, -314, 302}; Surface(30) = {30};
+    Line Loop(31) = {314, -303, -313, 301}; Surface(31) = {31};
+    Line Loop(32) = {308, -11, -318, 302}; Plane Surface(32) = {32};
+    Line Loop(33) = {318, -10, -306, 301}; Plane Surface(33) = {33};
+    Line Loop(34) = {307, -302, -301, -305}; Plane Surface(34) = {34};
+    Line Loop(35) = {304, 312, -111, -317}; Plane Surface(35) = {35};
+    Line Loop(36) = {317, -110, -310, 303}; Plane Surface(36) = {36};
+    Line Loop(37) = {311, -304, -303, -309}; Plane Surface(37) = {37};
+    Line Loop(38) = {63, -312, -315, 308}; Plane Surface(38) = {38};
+    Line Loop(39) = {317, -62, -318, 314}; Plane Surface(39) = {39};
 
-N_x_flow= 20;
-Transfinite Line {111,304,11,302} = N_x_flow;
-Transfinite Line {110,303,10,301} = N_x_flow/2;
+    Surface Loop(8) = {33, 27, 36, 20, 39, 31}; Volume(8) = {8};
+    Surface Loop(9) = {32, 38, 21, 35, 30, 39}; Volume(9) = {9};
 
-N_y_innerPin= 10;
-R_y_innerPin= 0.9;
-Transfinite Line {306,318,308,310,317,312} = N_y_innerPin Using Progression R_y_innerPin;
+    Transfinite Line {111,304,11,302} = N_x_flow;
+    Transfinite Line {110,303,10,301} = N_x_flow/2;
 
-N_z_flow= 50;
-R_z_flow= 0.1;
-Transfinite Line {313,314,315} = N_z_flow Using Bump R_z_flow;
+    Transfinite Line {306,318,308,310,317,312} = N_y_innerPin Using Progression R_y_innerPin;
 
-Transfinite Surface "*";
-Recombine Surface "*";
+    Transfinite Line {313,314,315} = N_z_flow Using Bump R_z_flow;
+
+    Transfinite Surface "*";
+    Recombine Surface "*";
 
 EndIf
 
@@ -380,9 +390,28 @@ EndIf
 //  Duplicata { Point{all_points[]}; }
 //}
 
+// ------------------------------------------------------------------------- //
+// Meshing
+Transfinite Surface "*";
+Recombine Surface "*";
+Transfinite Volume "*";
 
+If (Do_Meshing == 1)
+    Mesh 1; Mesh 2; Mesh 3;
+EndIf
 
+// ------------------------------------------------------------------------- //
+// Write .su2 meshfile
+If (Write_mesh == 1)
 
+    Mesh.Format = 42; // .su2 mesh format, 
+    If (Which_Mesh_Part == 1)
+        Save "fluid.su2";
+    ElseIf (Which_Mesh_Part == 2)
+        Save "solid.su2";
+    Else
+        Printf("Unvalid Which_Mesh_Part variable for output writing.");
+        Abort;
+    EndIf
 
-
-
+EndIf

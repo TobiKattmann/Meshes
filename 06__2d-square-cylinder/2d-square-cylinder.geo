@@ -1,5 +1,12 @@
+// ----------------------------------------------------------------------------------- //
 // Kattmann, 16.10.2018, 2D square cylinder with structured mesh
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
+
+// Evoque Meshing Algorithm?
+Do_Meshing= 1; // 0=false, 1=true
+// Write Mesh files in .su2 format
+Write_mesh= 0; // 0=false, 1=true
+
 // Geometric inputs
 D = 1; // edge length of square cylinder, used as relative measure, center of square is origin
 r = 0.5*D; // "radius", half edge length
@@ -8,11 +15,11 @@ lfront = 5.5*D; // downstream extension
 lback = 10.5*D; // upstream extension 
 
 // Mesh sizing inputs, x in flow direction
-Nx_front = 100;
-Nx_middle = 100;
-Nx_back = 100;
-Ny_top = 100; // domain axisymmetric around y-axis, so Ny_top=Ny_bottom
-Ny_middle = 100; 
+Nx_front = 10;
+Nx_middle = 10;
+Nx_back = 20;
+Ny_top = 10; // domain axisymmetric around y-axis, so Ny_top=Ny_bottom
+Ny_middle = 10; 
 
 // input for Progression and Bump
 Rx_front = 0.8;
@@ -23,7 +30,7 @@ Ry_middle = 0.2;
 
 gridsize = 0.1; // arbitrary, without influence
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // POINTS
 
 // cylinder points
@@ -45,7 +52,8 @@ Point(13) = {-r, -h, 0, gridsize};
 Point(14) = {-lfront, -h, 0, gridsize};
 Point(15) = {-lfront, -r, 0, gridsize};
 Point(16) = {-lfront, r, 0, gridsize};
-//-----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------- //
 // LINES
 
 // cylinder
@@ -68,7 +76,6 @@ Line(14) = {14, 15};
 Line(15) = {15, 16};
 Line(16) = {16, 5};
 
-
 // inner connections
 Line(17) = {1, 6};
 Line(18) = {2, 7};
@@ -79,41 +86,18 @@ Line(22) = {4, 13};
 Line(23) = {4, 15};
 Line(24) = {1, 16};
 
-
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // SURFACES (and Lineloops)
 
 // upper left, always in clockwise direction starting from upper edge
-Line Loop(1) = {5, -17, 24, 16};
-Plane Surface(1) = {1};
-
-// upper left
-Line Loop(2) = {6, -18, -1, 17};
-Plane Surface(2) = {2};
-
-// upper left
-Line Loop(3) = {7, 8, -19, 18};
-Plane Surface(3) = {3};
-
-// upper left
-Line Loop(4) = {19, 9, -20, -2};
-Plane Surface(4) = {4};
-
-// upper left
-Line Loop(5) = {20, 10, 11, -21};
-Plane Surface(5) = {5};
-
-// upper left
-Line Loop(6) = {-3, 21, 12, -22};
-Plane Surface(6) = {6};
-
-// upper left
-Line Loop(7) = {-23, 22, 13, 14};
-Plane Surface(7) = {7};
-
-// upper left
-Line Loop(8) = {-24, -4, 23, 15};
-Plane Surface(8) = {8};
+Line Loop(1) = {5, -17, 24, 16}; Plane Surface(1) = {1};
+Line Loop(2) = {6, -18, -1, 17}; Plane Surface(2) = {2};
+Line Loop(3) = {7, 8, -19, 18}; Plane Surface(3) = {3};
+Line Loop(4) = {19, 9, -20, -2}; Plane Surface(4) = {4};
+Line Loop(5) = {20, 10, 11, -21}; Plane Surface(5) = {5};
+Line Loop(6) = {-3, 21, 12, -22}; Plane Surface(6) = {6};
+Line Loop(7) = {-23, 22, 13, 14}; Plane Surface(7) = {7};
+Line Loop(8) = {-24, -4, 23, 15}; Plane Surface(8) = {8};
 
 // make structured mesh with transfinite lines, lines always directed towards origin
 Transfinite Line{5, -24, -23, -13} = Nx_front Using Progression Rx_front;
@@ -123,11 +107,27 @@ Transfinite Line{7, 19, 20, -11} = Nx_back Using Progression Rx_back;
 Transfinite Line{-16, -17, -18, 8, 14, -22, -21, -10} = Ny_top Using Progression Ry_top; // also meshes bottom
 Transfinite Line{15, 4, -2, -9} = Ny_middle Using Bump Ry_middle; // positive direction
 
-Transfinite Surface{1,2,3,4,5,6,7,8};
-Recombine Surface{1,2,3,4,5,6,7,8};
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // PHYSICAL GROUPS
 
 Physical Line("cylinder") = {1,2,3,4};
 Physical Line("farfield") = {5,6,7,8,9,10,11,12,13,14,15,16};
 Physical Surface("fluid") = {1,2,3,4,5,6,7,8};
+
+// ----------------------------------------------------------------------------------- //
+// Meshing
+Transfinite Surface "*";
+Recombine Surface "*";
+
+If (Do_Meshing == 1)
+    Mesh 1; Mesh 2;
+EndIf
+
+// ----------------------------------------------------------------------------------- //
+// Write .su2 meshfile
+If (Write_mesh == 1)
+
+    Mesh.Format = 42; // .su2 mesh format, 
+    Save "squareCylinder2D.su2";
+
+EndIf

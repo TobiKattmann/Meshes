@@ -1,5 +1,12 @@
+//-----------------------------------------------------------------------------
 // Kattmann, 16.10.2018, 2D pipe 1 cell in streamwise direction for streamwise periodicity
 //-----------------------------------------------------------------------------
+
+// Evoque Meshing Algorithm?
+Do_Meshing= 1; // 0=false, 1=true
+// Write Mesh files in .su2 format
+Write_mesh= 0; // 0=false, 1=true
+
 // Geometric inputs
 height=  2e-3; // pipe height
 width= 1e-4; // width of the one cell layer
@@ -30,15 +37,12 @@ Line(4) = {4,1};
 // SURFACES (and Lineloops)
 
 // pipe (clockwise)
-Line Loop(1) = {1,2,3,4};
-Plane Surface(1) = {1};
+Line Loop(1) = {1,2,3,4}; Plane Surface(1) = {1};
 
 // make structured mesh with transfinite Lines
 Transfinite Line{2,-4} = Nstreamwise; // streamwise direction
 Transfinite Line{1,-3} = Npipe Using Bump 0.1; // pipe height direction
 
-Transfinite Surface{1};
-Recombine Surface{1};
 //-----------------------------------------------------------------------------
 // PHYSICAL GROUPS
 
@@ -47,5 +51,20 @@ Physical Line("outlet") = {3};
 Physical Line("walls") = {2,4};
 Physical Surface("fluid") = {1};
 
+// ----------------------------------------------------------------------------------- //
+// Meshing
+Transfinite Surface "*";
+Recombine Surface "*";
 
+If (Do_Meshing == 1)
+    Mesh 1; Mesh 2;
+EndIf
 
+// ----------------------------------------------------------------------------------- //
+// Write .su2 meshfile
+If (Write_mesh == 1)
+
+    Mesh.Format = 42; // .su2 mesh format, 
+    Save "pipe1cell2D.su2";
+
+EndIf

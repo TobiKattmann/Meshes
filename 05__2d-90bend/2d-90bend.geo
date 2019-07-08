@@ -1,5 +1,12 @@
+// ----------------------------------------------------------------------------------- //
 // Kattmann, 16.10.2018, 2D 90 degree bend with inflow and outflow pipe
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
+
+// Evoque Meshing Algorithm?
+Do_Meshing= 1; // 0=false, 1=true
+// Write Mesh files in .su2 format
+Write_mesh= 1; // 0=false, 1=true
+
 // Geometric inputs
 d_pipe= 1.0; // pipe diameter
 r_bend= 3.0; // outer radius of the bend, i.e. r_bend>d_pipe !!
@@ -12,7 +19,7 @@ Nwall= 30; // Nodes from wall to wall
 Rwall= 1.0; // Scaling at the wall
 gridsize= 0.1; // Later on not important as structured mesh is achieved
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // POINTS
 
 // Inflow Pipe
@@ -30,7 +37,7 @@ Point(8) = {r_bend, d_pipe, 0, gridsize};
 // Circle Point
 Point(9) = {r_bend, r_bend, 0, gridsize};
 
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // LINES
 
 // Inflow (clockwise)
@@ -48,28 +55,18 @@ Line(8) = {7,8};
 // Circle parts (clockwise)
 Circle(9) = {4,9,8};
 Circle(10) = {7,9,3};
-//-----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------- //
 // SURFACES (and Lineloops)
-
-// Inflow (clockwise)
-Line Loop(1) = {1,2,3,4};
-Plane Surface(1) = {1};
-
-// Outflow (clockwise)
-Line Loop(2) = {5,6,7,8};
-Plane Surface(2) = {2};
-
-// Bend (clockwise)
-Line Loop(3) = {-3,9,-8,10};
-Plane Surface(3) = {3};
+Line Loop(1) = {1,2,3,4}; Plane Surface(1) = {1}; // Inflow (clockwise)
+Line Loop(2) = {5,6,7,8}; Plane Surface(2) = {2}; // Outflow (clockwise)
+Line Loop(3) = {-3,9,-8,10}; Plane Surface(3) = {3}; // Bend (clockwise)
 
 // make structured mesh with transfinite Lines
 Transfinite Line{2,-4,5,-7,9,-10} = Nflow;
 Transfinite Line{1,-3,8,-6} = Nwall Using Bump 0.1;
 
-Transfinite Surface{1,2,3};
-Recombine Surface{1,2,3};
-//-----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------- //
 // PHYSICAL GROUPS
 
 Physical Line("inlet") = {1};
@@ -79,4 +76,20 @@ Physical Line("in_pipe") = {2,4};
 Physical Line("out_pipe") = {5,7};
 Physical Surface("fluid") = {1,2,3};
 
+// ----------------------------------------------------------------------------------- //
+// Meshing
+Transfinite Surface "*";
+Recombine Surface "*";
 
+If (Do_Meshing == 1)
+    Mesh 1; Mesh 2;
+EndIf
+
+// ----------------------------------------------------------------------------------- //
+// Write .su2 meshfile
+If (Write_mesh == 1)
+
+    Mesh.Format = 42; // .su2 mesh format, 
+    Save "pipeBend2D.su2";
+
+EndIf

@@ -1,5 +1,13 @@
 // Kattmann, 18.06.2019, 3D 2 Zone mesh
 // ------------------------------------------------------------------------- //
+
+// Which domain part should be handled
+Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
+// Evoque Meshing Algorithm?
+Do_Meshing= 1; // 0=false, 1=true
+// Write Mesh files in .su2 format
+Write_mesh= 1; // 0=false, 1=true
+
 // Geometric inputs in [mm]
 length= 11; // in x-dir
 width= 3; // in y dir
@@ -181,8 +189,6 @@ Line Loop(134) = {139,103,-138,-123}; Plane Surface(134) = {134}; // sym right (
 Line Loop(135) = {135,-111,137,133,121,138,-101,131}; Plane Surface(135) = {135}; // top
 Line Loop(136) = {134,-110,136,132,120,139,-100,130}; Plane Surface(136) = {136}; // bottom
 Surface Loop(130) = {130,131,132,133,134,135,136,104,110,124}; Volume(130) = {130}; // 13? surfaces + Pin surfaces
-Physical Volume("fluid") = {130};
-
 
 // ------------------------------------------------------------------------- //
 // Solid Bottom Volume (without pins which are already meshed)
@@ -192,46 +198,68 @@ Line Loop(141) = {-3,7,127,-132,-8}; Plane Surface(141) = {141}; // back
 Line Loop(142) = {4,5,134,118,119,136,-8}; Plane Surface(142) = {142}; // sym right
 Line Loop(143) = {2,7,-126,139,-107,-6}; Plane Surface(143) = {143}; // sym left
 Line Loop(144) = {1,2,3,4}; Plane Surface(144) = {144};// heater surfacer
-// top (start of pins)
 Surface Loop(140) = {140,141,142,143,144,136,121,112,101}; Volume(140) = {140};
-//Physical Volume("solid") = {140,100,110,120};
-
-
-
 
 // ------------------------------------------------------------------------- //
 // Physical Tags
 
-// Fluid specific
-Physical Surface("inlet_fluid") = {130};
-Physical Surface("outlet_fluid") = {131};
-Physical Surface("sym-sides_fluid") = {132,133,134};
-Physical Surface("top-wall_fluid") = {135};
+If(Which_Mesh_Part == 0 || Which_Mesh_Part == 1 ) 
 
-// Solid specific
-Physical Surface("front_solid") = {140};
-Physical Surface("back_solid") = {141};
-Physical Surface("sym-sides_solid") = {142,143, 103,113,123};
-Physical Surface("bottom_solid") = {144};
-Physical Surface("pin1-tip_solid") = {100};
-Physical Surface("pin2-tip_solid") = {111};
-Physical Surface("pin3-tip_solid") = {120};
-Physical Surface("pin1-front_solid") = {102};
-Physical Surface("pin3-back_solid") = {122};
+    // interface
+    Physical Surface("pin1-interface_fluid") = {104};
+    Physical Surface("pin2-interface_fluid") = {110};
+    Physical Surface("pin3-interface_fluid") = {124};
+    Physical Surface("bottom-interface_fluid") = {136};
+    // Fluid specific
+    Physical Surface("inlet_fluid") = {130};
+    Physical Surface("outlet_fluid") = {131};
+    Physical Surface("sym-sides_fluid") = {132,133,134};
+    Physical Surface("top-wall_fluid") = {135};
+    // Volume
+    Physical Volume("fluid") = {130};
 
-// interface
-Physical Surface("pin1-interface_fluid") = {104};
-Physical Surface("pin1-interface_solid") = {104};
+EndIf
 
-Physical Surface("pin2-interface_fluid") = {110};
-Physical Surface("pin2-interface_solid") = {110};
+If(Which_Mesh_Part == 0 || Which_Mesh_Part == 2 )
 
-Physical Surface("pin3-interface_fluid") = {124};
-Physical Surface("pin3-interface_solid") = {124};
+    // interface
+    Physical Surface("pin1-interface_solid") = {104};
+    Physical Surface("pin2-interface_solid") = {110};
+    Physical Surface("pin3-interface_solid") = {124};
+    Physical Surface("bottom-interface_solid") = {136};
+    // Solid specific
+    Physical Surface("front_solid") = {140};
+    Physical Surface("back_solid") = {141};
+    Physical Surface("sym-sides_solid") = {142,143, 103,113,123};
+    Physical Surface("bottom_solid") = {144};
+    Physical Surface("pin1-tip_solid") = {100};
+    Physical Surface("pin2-tip_solid") = {111};
+    Physical Surface("pin3-tip_solid") = {120};
+    Physical Surface("pin1-front_solid") = {102};
+    Physical Surface("pin3-back_solid") = {122};
+    // Volume
+    Physical Volume("solid") = {140,100,110,120};
 
-Physical Surface("bottom-interface_fluid") = {136};
-Physical Surface("bottom-interface_solid") = {136};
+EndIf
 
-//Mesh 2;
-//Mesh 3;
-//Abort;
+// ------------------------------------------------------------------------- //
+// Meshing
+If (Do_Meshing == 1)
+    Mesh 1; Mesh 2; Mesh 3;
+EndIf
+
+// ------------------------------------------------------------------------- //
+// Write .su2 meshfile
+If (Write_mesh == 1)
+
+    Mesh.Format = 42; // .su2 mesh format, 
+    If (Which_Mesh_Part == 1)
+        Save "fluid.su2";
+    ElseIf (Which_Mesh_Part == 2)
+        Save "solid.su2";
+    Else
+        Printf("Unvalid Which_Mesh_Part variable.");
+        Abort;
+    EndIf
+
+EndIf
