@@ -2,13 +2,13 @@
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 0; // 0=false, 1=true
+Write_mesh= 1; // 0=false, 1=true
 // Translation in streamwise direction
-number_duplicates = 2;
+number_duplicates = 0;
 
 //Geometric inputs, ch: channel, Pin center is origin
 //ch_height > pin_outer_r + ch_box

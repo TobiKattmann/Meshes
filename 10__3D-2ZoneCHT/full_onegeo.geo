@@ -6,21 +6,21 @@ Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 1; // 0=false, 1=true
+Write_mesh= 0; // 0=false, 1=true
 
 // Geometric inputs
-length= 2;
+length= 20;
 width= 0.5;
 lower_h= 1; // height of lower (solid) block
 upper_h= 1; // height of upper (fluid) block
 
 // Mesh inputs
 gridsize = 0.1; // unimportant once everything is structured
-Nx= 20;
+Nx= 200;
 Ny= 4;
-Nz_solid= 15;
-Rz_solid= 1.25;
-Nz_fluid= 25;
+Nz_solid= 50;
+Rz_solid= 1.1;
+Nz_fluid= 50;
 Rz_fluid= 1.1;
 
 // ------------------------------------------------------------------------- //

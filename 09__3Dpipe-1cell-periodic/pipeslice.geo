@@ -1,11 +1,11 @@
 //-------------------------------------------------------------------------------------//
-//Kattmann, 13.05.2018, 3D Butterfly mesh
+//Kattmann, 13.05.2018, 3D Butterfly mesh in a circular pipe
 //-------------------------------------------------------------------------------------//
 
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 0; // 0=false, 1=true
+Write_mesh= 1; // 0=false, 1=true
 
 //Geometric inputs, ch: channel, Pin center is origin
 Radius= 0.5e-2; // Pipe Radius
@@ -15,10 +15,10 @@ InnerBox= Radius/2; // Distance to the inner Block of the butterfly mesh
 gridsize = 0.1; // unimportant once everything is structured
 
 //ch_box 
-Nbox = 20; // Inner Box points in x direction
+Nbox = 30; // Inner Box points in x direction
 
-Ncircu = 20; // Outer ring circu. points
-Rcircu = 0.8; // Spacing towards wall
+Ncircu = 30; // Outer ring circu. points
+Rcircu = 0.9; // Spacing towards wall
 
 sqrtTwo = Cos(45*Pi/180);
 
@@ -98,7 +98,7 @@ Transfinite Surface "*";
 Recombine Surface "*";
 
 If (Do_Meshing == 1)
-    Mesh 1; Mesh 2;
+    Mesh 1; Mesh 2; Mesh 3;
 EndIf
 
 // ----------------------------------------------------------------------------------- //
