@@ -5,13 +5,15 @@
 // Which domain part should be handled
 Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Add outlet diffusor
-OutletDiffusor= 1; // 0=false, 1=true
+OutletDiffusor= 0; // 0=false, 1=true
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 0; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
+// show the FFD corner points
+FFD_corner_point= 1; // 0=false, 1=true
 
 
 // Free parameters
@@ -97,6 +99,34 @@ If (r_pin_lower >= width ||
     Abort;
 EndIf
 
+// Show and print possible FFD corner points
+If (FFD_corner_point==1)
+    boxFactor= 1.3;
+
+    xLo= 0.5*length - boxFactor*r_pin_lower;
+    xHi= 0.5*length + boxFactor*r_pin_lower;
+    yLo= 0;
+    yHi= boxFactor*r_pin_lower;
+
+    // counterclockwise from lowest x&y value
+    Printf("===================================");
+    Printf("FFD corner points:");
+    Printf("%g | %g", xLo, yLo);
+    Printf("%g | %g", xHi, yLo);
+    Printf("%g | %g", xHi, yHi);
+    Printf("%g | %g", xLo, yHi);
+    Printf("===================================");
+
+    Point(1000) = {xLo, yLo, 0, gs};
+    Point(1001) = {xHi, yLo, 0, gs};
+    Point(1002) = {xHi, yHi, 0, gs};
+    Point(1003) = {xLo, yHi, 0, gs};
+
+    Line(1000) = {1000,1001};
+    Line(1001) = {1001,1002};
+    Line(1002) = {1002,1003};
+    Line(1003) = {1003,1000};
+EndIf
 
 // ------------------------------------------------------------------------- //
 // CHT Interface, complete description as it is part of fluid and solid
@@ -378,9 +408,19 @@ If (Write_mesh == 1)
 
     Mesh.Format = 42; // .su2 mesh format,
     If (Which_Mesh_Part == 1)
-        Save "fluid.su2";
+        If (OutletDiffusor==0)
+            Save "fluid.su2";
+        Else
+            Save "fluid_diffusor.su2";
+        EndIf
+
     ElseIf (Which_Mesh_Part == 2)
-        Save "solid.su2";
+        If (OutletDiffusor==0)
+            Save "solid.su2";
+        Else
+            Save "solid_diffusor.su2";
+        EndIf
+
     Else
         Printf("Unvalid Which_Mesh_Part variable for output writing.");
         Abort;
