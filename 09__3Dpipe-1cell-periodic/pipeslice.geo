@@ -1,5 +1,6 @@
 //-------------------------------------------------------------------------------------//
-//Kattmann, 13.05.2018, 3D Butterfly mesh in a circular pipe
+// T. Kattmann, 13.05.2018, 3D Butterfly mesh in a circular pipe
+// Create the mesh by calling this geo file with 'gmsh <this>.geo'.
 //-------------------------------------------------------------------------------------//
 
 // Evoque Meshing Algorithm?

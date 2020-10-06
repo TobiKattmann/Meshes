@@ -1,8 +1,12 @@
-//Kattmann, 13.05.2018, Channel with 1 Pin
+// ----------------------------------------------------------------------------------- //
+// T. Kattmann, 13.05.2018, Channel with 1 Pin
+// Create the mesh by calling this geo file with 'gmsh <this>.geo'.
+// For multizone mesh the zonal meshes have to be created using the first 
+// option 'Which_Mesh_Part' below and have to be married appropriatley.
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
@@ -304,6 +308,7 @@ If (Write_mesh == 1)
 EndIf
 
 // ----------------------------------------------------------------------------------- //
+// Note to self: I actually don't know if this works for mesh copying so I leave this in for now ... I'll check later 
 // See http://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfPlanes.aspx for explanation of the 4
 // Symmetry{...} parameters.
 // Note that transfinite lines are currently broken with symmetry

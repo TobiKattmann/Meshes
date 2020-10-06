@@ -1,33 +1,39 @@
-// Kattmann, 18.06.2019, 3D 2 Zone mesh
 // ------------------------------------------------------------------------- //
-// Geometric inputs in [mm]
+// T. Kattmann, 18.06.2019, 3D 2 Zone mesh
+// Create the mesh by calling this geo file with 'gmsh <this>.geo'.
+// For multizone mesh the zonal meshes have to be created using the first 
+// option 'Which_Mesh_Part' below and have to be married appropriatley.
+// ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 2; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
+Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 1; // 0=false, 1=true
+// Mesh Resolution
+Mesh_Resolution= 0; // 0=debugRes, 1=Res1, 2=Res2
+// Have conical pins?
+ConicalPins= 1; // 0=No, i.e. cylindrical, 1=Yes 
+
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
 dist= 6.44 * scale_factor; // distance between pin midpoints, each pin has 6 surrounding pins, i.e. 60 deg between each
+upper_h= 10.0 * scale_factor; // height (z-dir) of fluid domain/pins
+lower_h= 5.0 * scale_factor; // height (z-dir) of solid domain/pins
 
-If (1==0) // cylindrical
+If (ConicalPins==0) // cylindrical
     r_pin_lower= 2.0 * scale_factor; // lower pin radius
     r_pin_upper= 2.0 * scale_factor; // upper pin radius
-ElseIf(0==0) // conical
+ElseIf(ConicalPins==1) // conical
     r_pin_lower= 2.3 * scale_factor; // lower pin radius
     r_pin_upper= 0.56 * scale_factor; // upper pin radius
 EndIf
 
-// dependent parameters
+// Dependent parameters
 rad2deg= Pi/180; // conversion factor as gmsh Cos/Sin functions take radian values
 length= 2 * Cos(30*rad2deg)*dist; // length (in x-dir)
 width= Sin(30*rad2deg)*dist; // width (in y-dir)
-
-// fix parameters
-upper_h= 10.0 * scale_factor; // height (z-dir) of fluid domain/pins
-lower_h= 5.0 * scale_factor; // height (z-dir) of solid domain/pins
 
 Printf("===================================");
 Printf("Free parameters:");
@@ -45,7 +51,7 @@ Printf("===================================");
 // Mesh inputs
 gs = 0.5 *scale_factor; // gridsize
 
-If(0==0) // debugRes
+If(Mesh_Resolution==0) // debugRes
     // interface meshing parameteres. Also sufficient for fluid domain meshing.
     N_x_flow= 10; // #gridpoints in flow x-direction on a patch. Also N_x_flow/2 on smaller patches employed.
 
@@ -62,7 +68,7 @@ If(0==0) // debugRes
     N_z_solid= 10; // #points from bottom interface to heater surface
     R_z_solid= 1.18; // progression for N_z_solid
 
-ElseIf(1==0) // Res1
+ElseIf(Mesh_Resolution==1) // Res1
     // interface meshing parameteres. Also sufficient for fluid domain meshing.
     N_x_flow= 20; // #gridpoints in flow x-direction on a patch. Also N_x_flow/2 on smaller patches employed.
 
@@ -79,7 +85,7 @@ ElseIf(1==0) // Res1
     N_z_solid= 20; // #points from bottom interface to heater surface
     R_z_solid= 1.18; // progression for N_z_solid
 
-ElseIf(1==0) // Res2
+ElseIf(Mesh_Resolution==2) // Res2
     // interface meshing parameteres. Also sufficient for fluid domain meshing.
     N_x_flow= 30; // #gridpoints in flow x-direction on a patch. Also N_x_flow/2 on smaller patches employed.
 
@@ -844,22 +850,6 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
 EndIf
 
-
-// ------------------------------------------------------------------------- //
-// Scale by a factor, everything beyond point position definition is just 
-// connection and therefor independent of the scale
-//all_points[] = Point '*';
-//Dilate {{0, 0, 0}, {scale_factor, scale_factor, scale_factor}} {
-//   Point{all_points[]}; // Select all Points
-//}
-
-// ------------------------------------------------------------------------- //
-//Mesh 2;
-//all_points[]= Point '*';
-//Translate {0, 0, 10} {
-//  Duplicata { Point{all_points[]}; }
-//}
-
 // ------------------------------------------------------------------------- //
 // Meshing
 Coherence;
@@ -887,6 +877,7 @@ If (Write_mesh == 1)
 
 EndIf
 
+// Write .cgns meshfile
 //If (Write_mesh == 1)
 //
 //    Mesh.Format = 32; // .cgns mesh format, 
@@ -903,7 +894,3 @@ EndIf
 //
 //EndIf
 
-//Characteristic Length {110} = 0.0001;
-//Characteristic Length {304, 306} = 0.0001;
-//Characteristic Length {10, 303, 301} = 0.0001;
-//Characteristic Length {10, 110} = 0.0005;

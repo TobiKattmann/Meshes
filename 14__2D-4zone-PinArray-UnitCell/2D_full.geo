@@ -1,6 +1,9 @@
-// Kattmann, 18.06.2019, 3D 2 Zone mesh
 // ------------------------------------------------------------------------- //
-// Geometric inputs in [mm]
+// T. Kattmann, 18.06.2019, 2D 2 Zone mesh
+// Create the mesh by calling this geo file with 'gmsh <this>.geo'.
+// For multizone mesh the zonal meshes have to be created using the first 
+// option 'Which_Mesh_Part' below and have to be married appropriatley.
+// ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
 Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
@@ -9,25 +12,23 @@ OutletDiffusor= 0; // 0=false, 1=true
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 0; // 0=false, 1=true
+Write_mesh= 1; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 // show the FFD corner points
 FFD_corner_point= 1; // 0=false, 1=true
 
-
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
 dist= 6.44 * scale_factor; // distance between pin midpoints, each pin has 6 surrounding pins, i.e. 60 deg between each
 r_pin_lower= 2.0 * scale_factor; // lower pin radius
-InnerRadiusFactor= 0.3; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1.
-// Diffusor inputs are below
+InnerRadiusFactor= 0.3; // Thickness of the pin solid (0.9=small pin wall, 0.1= close to filled circle arc). Requires 0 < value < 1.
+// Diffusor inputs are below in the respective section
 
-// dependent parameters
+// Dependent parameters
 rad2deg= Pi/180; // conversion factor as gmsh Cos/Sin functions take radian values
-length= 2 * Cos(30*rad2deg)*dist; // length (in x-dir)
-width= Sin(30*rad2deg)*dist; // width (in y-dir)
-innerPinLength= r_pin_lower*InnerRadiusFactor*2*Pi;
+length= 2 * Cos(30*rad2deg)*dist; // domain length (in x-dir)
+width= Sin(30*rad2deg)*dist; // domain width (in y-dir)
 
 Printf("===================================");
 Printf("Free parameters:");
@@ -36,7 +37,6 @@ Printf("-> lower pin radius: %g", r_pin_lower);
 Printf("Dependent parameters");
 Printf("-> length: %g", length);
 Printf("-> width: %g", width);
-Printf("-> inner pin length: %g", innerPinLength); // 2quarter and one half circle make a full one
 Printf("===================================");
 
 // Mesh inputs

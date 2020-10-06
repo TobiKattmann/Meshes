@@ -6,7 +6,7 @@ Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 1; // 0=false, 1=true
+Write_mesh= 0; // 0=false, 1=true
 
 // Geometric inputs in [mm]
 length= 11; // in x-dir
