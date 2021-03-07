@@ -2,7 +2,7 @@
 // T. Kattmann, 13.05.2018, Channel with 1 Pin
 // Create the mesh by calling this geo file with 'gmsh <this>.geo'.
 // For multizone mesh the zonal meshes have to be created using the first 
-// option 'Which_Mesh_Part' below and have to be married appropriatley.
+// option 'Which_Mesh_Part' below and have to be married appropriately.
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
@@ -193,7 +193,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Transfinite Line{-31, 33, 36, 39} = Npin_radial Using Progression Rpin_radial;
     Transfinite Line{35, -37} = Npin2_circ;
 
-    //segement 3
+    //segment 3
     //Transfinite Line{36, 39} = Npin_radial Using Progression Rpin_radial;
     Transfinite Line{38, -40} = Npin3_circ;
 
