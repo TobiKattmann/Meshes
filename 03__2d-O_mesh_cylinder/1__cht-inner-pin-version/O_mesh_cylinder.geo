@@ -5,11 +5,11 @@
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
 // Evoke Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 0; // 0=false, 1=true
+Write_mesh= 1; // 0=false, 1=true
 
 //Geometric inputs
 cylinder_diameter = 1;
@@ -119,6 +119,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Physical Surface("surface_mesh") = {11, 12};
 
 EndIf
+
 // ----------------------------------------------------------------------------------- //
 Transfinite Surface "*";
 Recombine Surface "*";
@@ -132,6 +133,13 @@ EndIf
 If (Write_mesh == 1)
 
     Mesh.Format = 42; // .su2 mesh format, 
-    Save "O_mesh_cylinder.su2";
+    If (Which_Mesh_Part == 1)
+        Save "fluid.su2";
+    ElseIf (Which_Mesh_Part == 2)
+        Save "solid.su2";
+    Else
+        Printf("Invalid Which_Mesh_Part variable.");
+        Abort;
+    EndIf
 
 EndIf

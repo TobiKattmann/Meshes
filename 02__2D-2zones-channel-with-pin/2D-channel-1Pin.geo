@@ -301,7 +301,7 @@ If (Write_mesh == 1)
     ElseIf (Which_Mesh_Part == 2 && !(number_duplicates > 0))
         Save "solid.su2";
     Else
-        Printf("Unvalid Which_Mesh_Part variable.");
+        Printf("Invalid Which_Mesh_Part variable.");
         Abort;
     EndIf
 
