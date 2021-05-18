@@ -243,7 +243,8 @@ EndIf
 If (Mirror_Mesh)
 
     y_plane = -1;
-    d_plane = 0.00322;
+    //d_plane = 0.00322; // 4 half pins in the domain
+    d_plane = 0.0; // 4 quarter pins and full pin in the middle
 
     //Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
     p[] = Point "*";
