@@ -19,6 +19,9 @@ Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 FFD_corner_point= 0; // 0=false, 1=true
 // Mirror the mesh
 Mirror_Mesh= 1; // 0=false, 1=true
+// Mirror along the top or bottom symmetry plane
+Mirror_plane= 1; // 0=upper. 1=lower
+
 
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
@@ -234,7 +237,13 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
     If(Mirror_Mesh==0)
         Physical Line("fluid_symmetry") = {41,42,43,44,46,47,48};
     Else
-        Physical Line("fluid_symmetry") = {41,42,43,44};
+        If(Mirror_plane==0)
+            Printf("Upper - Original fluid_sym");
+            Physical Line("fluid_symmetry") = {41,42,43,44};
+        Else
+            Printf("Lower - Original fluid_sym");
+            Physical Line("fluid_symmetry") = {46,47,48};
+        EndIf
     EndIf
     Physical Surface("fluid_surf") = {10,11,12,13,14,15,16};
 
@@ -243,8 +252,11 @@ EndIf
 If (Mirror_Mesh)
 
     y_plane = -1;
-    //d_plane = 0.00322; // 4 half pins in the domain
-    d_plane = 0.0; // 4 quarter pins and full pin in the middle
+    If(Mirror_plane==0)
+        d_plane = 0.00322; // 4 half pins in the domain
+    Else 
+        d_plane = 0.0; // 4 quarter pins and full pin in the middle
+    EndIf
 
     //Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
     p[] = Point "*";
@@ -267,10 +279,18 @@ If (Mirror_Mesh)
     new_fluid_outlet[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 45 }; } };
     Physical Line("fluid_outlet") += { new_fluid_outlet[] };
 
-    // symmetry
-    new_fluid_symmetry_gone[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 46,47,48 }; } };
-    new_fluid_symmetry[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 41,42,43,44 }; } };
-    Physical Line("fluid_symmetry2") += { new_fluid_symmetry[] };
+    // symmetry, 1 symmetry dissappears of course. New  naming to make periodic boundary possible, otherwise just adding would suffice
+    If(Mirror_plane==0)
+        Printf("Upper - copied fluid_sym");
+        new_fluid_symmetry_gone[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 46,47,48 }; } };
+        new_fluid_symmetry[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 41,42,43,44 }; } };
+        Physical Line("fluid_symmetry2") = { new_fluid_symmetry[] }; // make it += if one symmetry is wanted, also call it "fluid_symmetry" then
+    Else
+        Printf("Lower - copied fluid_sym");
+        new_fluid_symmetry_gone[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 41,42,43,44 }; } };
+        new_fluid_symmetry[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 46,47,48 }; } };
+        Physical Line("fluid_symmetry2") = { new_fluid_symmetry[] };
+    EndIf
 
     // fluid_pin123_interface
     new_pin1[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 10, 11 }; } };
