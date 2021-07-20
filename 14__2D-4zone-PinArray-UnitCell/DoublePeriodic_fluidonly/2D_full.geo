@@ -26,7 +26,7 @@ Mirror_plane= 1; // 0=upper. 1=lower
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
 dist= 6.44 * scale_factor; // distance between pin midpoints, each pin has 6 surrounding pins, i.e. 60 deg between each
-r_pin_lower= 2.0 * scale_factor; // lower pin radius
+r_pin_lower= 1.0 * scale_factor; // lower pin radius
 InnerRadiusFactor= 0.3; // Thickness of the pin solid (0.9=small pin wall, 0.1= close to filled circle arc). Requires 0 < value < 1.
 // Diffusor inputs are below in the respective section
 
