@@ -8,11 +8,11 @@ Do_Meshing= 1; // 0=false, 1=true
 Write_mesh= 1; // 0=false, 1=true
 
 // Geometric inputs
-gas_inlet_diameter= 1.0;
-air_inlet_diameter= 1.0;
-gas_tube_length=2.0;
-air_tube_length=2.0;
-downstream_length= 3.0;
+gas_inlet_diameter= 0.015;
+air_inlet_diameter= 0.015;
+gas_tube_length=0.045;
+air_tube_length=0.045;
+downstream_length= 0.09;
 
 // Mesh sizing inputs
 Nwall= 30; // Nodes for all spacings
