@@ -10,10 +10,10 @@ Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 0; // 0=false, 1=true
-// bool whether to mirrir mesh along x-axes. If not mirrored, a symmetry bc is necessary
-Mirror_Mesh= 0; // 0=false, 1=true
+// bool whether to mirrir mesh along x-axes. In case of not mirrored, a symmetry bc is necessary
+Mirror_Mesh= 1; // 0=false, 1=true
 
-Exclude_code_bit= 0;
+Exclude_code_bit= 1;
 
 //Geometric inputs
 pin_d_lower = 1; // lower pin diameter
@@ -163,8 +163,8 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
     Line(140) = {12,142};
     Line(141) = {13,143};
     Line(142) = {14,144};
-    Line(143) = {145,15}; // had to be reversed because the mirrored mesh sometimes fucks this up for some reason.
-    Transfinite Line {140,141,142,-143} = N_radial_heater Using Progression R_radial_heater;
+    Line(143) = {15,145}; // had to be reversed because the mirrored mesh sometimes fucks this up for some reason.
+    Transfinite Line {140,141,142,143} = N_radial_heater Using Progression R_radial_heater;
 
     // connecting lines between lower and upper outer heater surface
     Line(147) = {32, 142};
@@ -184,13 +184,13 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
 
     // fluid top
     Curve Loop(112) = {142, -144, -140, 11}; Plane Surface(112) = {112};
-    Curve Loop(113) = {142, 145, 143, -12}; Plane Surface(113) = {113};
-    Curve Loop(114) = {146, -141, -13, -143}; Plane Surface(114) = {114};
+    Curve Loop(113) = {142, 145, -143, -12}; Plane Surface(113) = {113};
+    Curve Loop(114) = {146, -141, -13, 143}; Plane Surface(114) = {114};
     Physical Surface("fluid_top") = {112,113,114};
 
     // Inner surfaces from from pin sectioning
     Curve Loop(115) = {142, -148, -32, 22}; Plane Surface(115) = {115};
-    Curve Loop(116) = {33, 149, 143, -23}; Plane Surface(116) = {116};
+    Curve Loop(116) = {33, 149, -143, -23}; Plane Surface(116) = {116};
 
     // Fluid extended heater domain, volume definition
     Surface Loop(11) = {110, 4, 1, 112, 107, 115}; Volume(11) = {11};
@@ -377,7 +377,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
         // Layers {2}; // Lines kept for completeness, not necessary right now.
         // Recombine;
     }
-
+    
     // Unfortunately one cannot extrude with keeping meshing information and can change meshing information
     // of single lines afterwards. So one has to extrude without that and mesh everyhting by hand again.
     // This is maybe not so bad here as therefore we can remove the Progressions for the heater bottom.
@@ -403,34 +403,27 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     // radially inner pin
     Transfinite Curve {490, 471, 469, 537} = N_pin_solid_radial_outer Using Progression R_pin_solid_radial_outer;
 
+    Coherence; // Remove all identical entities
+    
 EndIf
 
 // ----------------------------------------------------------------------------------- //
 // Mirror the mesh along the symmetry axes
+//Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
+Geometry.AutoCoherence = 0;
+// https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
+Geometry.CopyMeshingMethod = 1; // keep meshing information while copying
 
 If (Mirror_Mesh == 1)
-    //Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
-    Geometry.AutoCoherence = 0;
-    // https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
-    Geometry.CopyMeshingMethod = 1; // keep meshing information while copying
-
+    
     // Put all Volumes in an array http://onelab.info/pipermail/gmsh/2017/011186.html
-    //v[] = Volume "*";
+    volumes[] = Volume "*";
 
-    If (Which_Mesh_Part==0)
-        Symmetry {0, 1, 0, 0} {
-            Duplicata { Volume{14}; Volume{11}; Volume{13}; Volume{12}; Volume{15}; Volume{16};
-                        Volume{1}; Volume{101}; Volume{100}; Volume{2}; Volume{105}; Volume{3}; Volume{106}; Volume{104}; Volume{107}; Volume{102}; Volume{103}; }
-        }
-    ElseIf (Which_Mesh_Part==1)
-        Symmetry {0, 1, 0, 0} {
-            Duplicata { Volume{14}; Volume{11}; Volume{13}; Volume{12}; Volume{15}; Volume{16}; }
-        }
-    ElseIf (Which_Mesh_Part==2)
-        Symmetry {0, 1, 0, 0} {
-            Duplicata { Volume{1}; Volume{101}; Volume{100}; Volume{2}; Volume{105}; Volume{3}; Volume{106}; Volume{104}; Volume{107}; Volume{102}; Volume{103}; }
-        }
-    EndIf
+    Symmetry {0, 1, 0, 0} {
+        Duplicata { Volume{ volumes[] }; }
+    }
+
+    Coherence; // Remove all identical entities
 
 EndIf
 
@@ -442,8 +435,6 @@ Transfinite Volume "*";
 If (Do_Meshing == 1)
     Mesh 1; Mesh 2; Mesh 3;
 EndIf
-
-
 
 // ----------------------------------------------------------------------------------- //
 // Write .su2 meshfile
@@ -461,4 +452,14 @@ If (Write_mesh == 1)
 
 EndIf
 //+
-
+Coherence;
+//+
+Coherence;
+//+
+Coherence;
+//+
+Coherence;
+//+
+Coherence;
+//+
+Coherence;
