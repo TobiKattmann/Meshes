@@ -6,14 +6,12 @@
 
 // Which domain part should be handled
 Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
+// bool whether to mirrir mesh along x-axes. In case of not mirrored, a symmetry bc is necessary
+Mirror_Mesh= 1; // 0=false, 1=true
 // Evoke Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 0; // 0=false, 1=true
-// bool whether to mirrir mesh along x-axes. In case of not mirrored, a symmetry bc is necessary
-Mirror_Mesh= 1; // 0=false, 1=true
-
-Exclude_code_bit= 1;
+Write_mesh= 1; // 0=false, 1=true
 
 //Geometric inputs
 m_to_mm_scale= 1e-3;
