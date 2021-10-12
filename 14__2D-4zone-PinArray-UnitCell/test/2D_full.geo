@@ -14,7 +14,7 @@ Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 1; // 0=false, 1=true
 // Mesh Resolution
-Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
+Mesh_Resolution= 1; // 0=debugRes, 1=Res1, 2=Res2
 // show the FFD corner points
 FFD_corner_point= 0; // 0=false, 1=true
 // Mirror the mesh
@@ -269,7 +269,7 @@ If (Mirror_Mesh)
     // symmetry
     new_fluid_symmetry_gone[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 46,47,48 }; } };
     new_fluid_symmetry[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 41,42,43,44 }; } };
-    Physical Line("fluid_symmetry2") += { new_fluid_symmetry[] };
+    Physical Line("fluid_symmetry_upper") = { new_fluid_symmetry[] };
 
     // fluid_pin123_interface
     new_pin1[] = Symmetry {0, y_plane, 0, d_plane} { Duplicata { Line{ 10, 11 }; } };
