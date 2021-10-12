@@ -16,16 +16,18 @@ Mirror_Mesh= 1; // 0=false, 1=true
 Exclude_code_bit= 1;
 
 //Geometric inputs
-pin_d_lower = 1; // lower pin diameter
-pin_d_upper = 0.7; // upper pin diameter, choose smaller for conical pin
+m_to_mm_scale= 1e-3;
+pin_d_lower = 4.6  * m_to_mm_scale; // lower pin diameter
+pin_d_upper = 1.06 * m_to_mm_scale; // upper pin diameter, choose smaller for conical pin
 pin_r_lower = pin_d_lower/2; // radius
 pin_r_upper = pin_d_lower/2;
-pin_height= 2;
+pin_height= 10 * m_to_mm_scale;
 
 bf_factor= 0.3; // Must be smaller than 1
-bf_length= pin_d_lower * bf_factor; // side length of inner pin butterly mesh
+bf_length_lower= pin_d_lower * bf_factor; // side length of inner pin butterly mesh, lower surface
+bf_length_upper= pin_d_upper * bf_factor; // side length of inner pin butterly mesh, upper surface
 
-heater_depth= 1; // extension of the heater
+heater_depth= 5 * m_to_mm_scale; // extension of the heater
 heater_d= 3 * pin_d_lower; // must be bigger than pin_d_lower but smaller than mesh_radius
 heater_r= heater_d/2;
 
@@ -96,13 +98,13 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
     Line(20) = {2,12};
     Line(21) = {3,13};
     Line(22) = {4,14};
-    Line(23) = {5,15};
+    Line(23) = {5,15}; // Line orientation has to be swapped, because fluid mesh mirroring doesnt like it
     Transfinite Line {20,21,22,23} = N_pin_height Using Progression R_pin_height;
 
     // pin surfaces
     Curve Loop(1) = {1, 22, -11, -20}; Surface(1) = {1};
     Curve Loop(2) = {2, 23, -12, -22}; Surface(2) = {2};
-    Curve Loop(3) = {3, 21, -13, -23}; Surface(3) = {3};
+    Curve Loop(3) = {-3, -21, 13, 23}; Surface(3) = {3};
 
     /// bottom interface
     Point(32) = {-heater_d, 0, 0, gridsize};
@@ -128,7 +130,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
 
     Curve Loop(4) = {1, 32, -34, -30}; Surface(4) = {4};
     Curve Loop(5) = {2, 33, -35, -32}; Surface(5) = {5};
-    Curve Loop(6) = {3, 31, -36, -33}; Surface(6) = {6};
+    Curve Loop(6) = {-3, -31, 36, 33}; Surface(6) = {6};
 
     //Physical Tags
     If (Which_Mesh_Part==1)
@@ -280,10 +282,10 @@ EndIf
 If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
     /// Lower inner pin
-    Point(82) = {-bf_length, 0,         0, gridsize};
-    Point(83) = { bf_length, 0,         0, gridsize};
-    Point(84) = {-bf_length, bf_length, 0, gridsize};
-    Point(85) = { bf_length, bf_length, 0, gridsize};
+    Point(82) = {-bf_length_lower, 0,         0, gridsize};
+    Point(83) = { bf_length_lower, 0,         0, gridsize};
+    Point(84) = {-bf_length_lower, bf_length_lower, 0, gridsize};
+    Point(85) = { bf_length_lower, bf_length_lower, 0, gridsize};
 
     // radial outward going between butterfly core and pin interface
     Line(37) = {82, 2};
@@ -304,10 +306,10 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
 
     /// Upper inner pin
-    Point(92) = {-bf_length, 0,         pin_height, gridsize};
-    Point(93) = { bf_length, 0,         pin_height, gridsize};
-    Point(94) = {-bf_length, bf_length, pin_height, gridsize};
-    Point(95) = { bf_length, bf_length, pin_height, gridsize};
+    Point(92) = {-bf_length_upper, 0,         pin_height, gridsize};
+    Point(93) = { bf_length_upper, 0,         pin_height, gridsize};
+    Point(94) = {-bf_length_upper, bf_length_upper, pin_height, gridsize};
+    Point(95) = { bf_length_upper, bf_length_upper, pin_height, gridsize};
 
     // radial outward going between butterfly core and pin interface
     Line(45) = {92, 12};
@@ -365,6 +367,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Surface Loop(100) = {13, 8, 17, 21, 20, 22}; Volume(100) = {100};
     // To above line: Use high number so that new volumes from extrude will get same number between
     // solid only and full mesh.
+    Physical Volume("solid_volume") = {1,2,3,100};
 
     // Make a useless line with a high line number in order to have the same line number for solid
     // and fluid+solid mesh. The hypothesis is, that the automatic numbering used during the Extrusion
@@ -389,7 +392,8 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     EndIf
 
     // Lines in depth direction. Progression to match fluid bottom mesh
-    Transfinite Curve {416, 407, 473, 495, 518, 452, 456, 412, 408, 474, 430, 434} = N_heater_depth Using Progression R_heater_depth;
+    //Transfinite Curve {416, 407, 473, 495, 518, 452, 456, 412, 408, 474, 430, 434} = N_heater_depth Using Progression R_heater_depth;
+    Transfinite Curve {416, 408, 407, 473, 495, 474, 518, 430, 451, 460, 434, 412} = N_heater_depth Using Progression R_heater_depth;
 
     // eigths pin parts
     Transfinite Curve {404, 402, 493, 513, 446, 448} = N_pin_circ_eigth;
@@ -398,12 +402,20 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Transfinite Curve {426, 424, 468, 512} = 2*N_pin_circ_eigth;
 
     // radially outer heater surface
-    Transfinite Curve {405, 403, 447, 425} = N_radial_heater Using Progression R_radial_heater;
+    Transfinite Curve {405, 403, 449, 425} = N_radial_heater Using Progression R_radial_heater;
 
     // radially inner pin
     Transfinite Curve {490, 471, 469, 537} = N_pin_solid_radial_outer Using Progression R_pin_solid_radial_outer;
 
     Coherence; // Remove all identical entities
+
+    // create named surfaces and volumes, Mirrored part below
+    Physical Surface("solid_heater_bottom", 872) = {422, 444, 466, 510, 554, 532, 488};
+    Physical Surface("solid_heater_sides", 873) = {417, 439, 461};
+    Physical Volume("solid_volume", 4) += {101, 102, 103, 104, 107, 105, 106};
+
+
+
     
 EndIf
 
@@ -424,6 +436,26 @@ If (Mirror_Mesh == 1)
     }
 
     Coherence; // Remove all identical entities
+
+    // For some reason the copied entities do not carry their physical tags with them.
+    // Therefore we have to do it manually for the mirrored parts here
+    If (Which_Mesh_Part==1)
+        Physical Surface("fluid_freestream", 5) += {285, 306, 342};
+        Physical Surface("fluid_bottom", 7) += {280, 311, 347};
+        Physical Surface("fluid_heater_interface", 2) += {187, 254, 223};
+        Physical Surface("fluid_top", 3) += {290, 316, 337, 233, 244, 197};
+        Physical Surface("fluid_pin_interface", 1) += {192, 259, 218};
+        Physical Volume("fluid_volume", 4) += {274, 181, 243, 305, 212, 336};
+
+    ElseIf (Which_Mesh_Part==2)
+        Physical Surface("solid_heater_bottom", 872) += {1004, 1035, 1066, 1097, 1128, 1190, 1159};
+        Physical Surface("solid_heater_sides", 873) += {1019, 1050, 1081};
+        Physical Surface("solid_heater_interface", 2) += {1030, 1061, 999};
+        Physical Surface("solid_pin_interface", 1) += {911, 942, 885};
+        Physical Surface("solid_pin_top", 3) += {890, 906, 968, 957};
+        Physical Volume("solid_volume", 4) += {1122, 998, 1029, 874, 1153, 1091, 967, 905, 1184, 936, 1060};
+
+    EndIf
 
 EndIf
 
@@ -452,14 +484,10 @@ If (Write_mesh == 1)
 
 EndIf
 //+
-Coherence;
 //+
-Coherence;
+
 //+
-Coherence;
 //+
-Coherence;
 //+
-Coherence;
 //+
-Coherence;
+//+
