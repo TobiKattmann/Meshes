@@ -4,6 +4,8 @@
 // The inner pin is hollow.
 // ----------------------------------------------------------------------------------- //
 
+// Create fluid and solid mesh seperately and merge together e.g. by hand.
+
 // Which domain part should be handled
 Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
 // Evoke Meshing Algorithm?
@@ -22,11 +24,11 @@ inner_pin_r = inner_pin_d/2;
 //Mesh inputs
 gridsize = 0.1;
 Ncylinder = 40;
-Nradial = 20;
-Rradial = 1.25;
+Nradial = 50;
+Rradial = 1.15;
 
-NPinRadial = 5;
-RPinRadial = 0.87;
+NPinRadial = 10;
+RPinRadial = 0.91;
 
 // Each zone is self-sufficient (i.e. has all of its own Points/Lines etc.)
 // ----------------------------------------------------------------------------------- //
