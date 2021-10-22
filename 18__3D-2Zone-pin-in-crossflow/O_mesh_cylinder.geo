@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
 // bool whether to mirrir mesh along x-axes. In case of not mirrored, a symmetry bc is necessary
 Mirror_Mesh= 1; // 0=false, 1=true
 // Evoke Meshing Algorithm?
