@@ -73,7 +73,7 @@ done
 
 # ---------------------------------------------------------------------------- #
 
-# Get rid of all ^M characters if single-zone mesh file were written under windows
-# This is useful if file is displayed in vim under linux
+# Get rid of all ^M characters if single-zone mesh file were written under windows.
+# This is useful if file is displayed in vim under linux.
 sed -i -e "s///" $OUTPUT
 
