@@ -22,8 +22,8 @@ pin_r_upper = pin_d_lower/2;
 pin_height= 10 * m_to_mm_scale;
 
 bf_factor= 0.3; // Must be smaller than 1
-bf_length_lower= pin_d_lower * bf_factor; // side length of inner pin butterfly mesh, lower surface
-bf_length_upper= pin_d_upper * bf_factor; // side length of inner pin butterfly mesh, upper surface
+bf_length_lower= pin_r_lower * bf_factor; // side length of inner pin butterfly mesh, lower surface
+bf_length_upper= pin_r_upper * bf_factor; // side length of inner pin butterfly mesh, upper surface
 
 heater_depth= 5 * m_to_mm_scale; // extension of the heater
 heater_d= 3 * pin_d_lower; // must be bigger than pin_d_lower but smaller than mesh_radius
