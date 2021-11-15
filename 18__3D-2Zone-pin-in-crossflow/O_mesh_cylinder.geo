@@ -68,11 +68,11 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
     /// Pin Surface
     // lower pin
     Point(1) = {0, 0, 0, gridsize};
-    Point(2) = {-pin_d_lower, 0, 0, gridsize};
-    Point(3) = { pin_d_lower, 0, 0, gridsize};
+    Point(2) = {-pin_r_lower, 0, 0, gridsize};
+    Point(3) = { pin_r_lower, 0, 0, gridsize};
 
-    Point(4) = {-Sin(45*rad2deg)*pin_d_lower, Sin(45*rad2deg)*pin_d_lower, 0, gridsize}; // butterly points on the interface
-    Point(5) = { Sin(45*rad2deg)*pin_d_lower, Sin(45*rad2deg)*pin_d_lower, 0, gridsize};
+    Point(4) = {-Sin(45*rad2deg)*pin_r_lower, Sin(45*rad2deg)*pin_r_lower, 0, gridsize}; // butterly points on the interface
+    Point(5) = { Sin(45*rad2deg)*pin_r_lower, Sin(45*rad2deg)*pin_r_lower, 0, gridsize};
 
     Circle(1) = {2,1,4}; // 3 circle segments from front to back
     Circle(2) = {4,1,5};
