@@ -5,31 +5,31 @@
 // ----------------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 2;// 0=all, 1=Fluid, 2=Solid
 // bool whether to mirrir mesh along x-axes. In case of not mirrored, a symmetry bc is necessary
 Mirror_Mesh= 1; // 0=false, 1=true
 // Evoke Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 1; // 0=false, 1=true
+Write_mesh= 0; // 0=false, 1=true
 
 //Geometric inputs
 m_to_mm_scale= 1e-3;
 pin_d_lower = 4.6  * m_to_mm_scale; // lower pin diameter
-pin_d_upper = 1.06 * m_to_mm_scale; // upper pin diameter, choose smaller for conical pin
+pin_d_upper = 4.6 * m_to_mm_scale; // upper pin diameter, choose smaller for conical pin (1.06 before)
 pin_r_lower = pin_d_lower/2; // radius
 pin_r_upper = pin_d_lower/2;
 pin_height= 10 * m_to_mm_scale;
 
 bf_factor= 0.3; // Must be smaller than 1
-bf_length_lower= pin_d_lower * bf_factor; // side length of inner pin butterly mesh, lower surface
-bf_length_upper= pin_d_upper * bf_factor; // side length of inner pin butterly mesh, upper surface
+bf_length_lower= pin_d_lower * bf_factor; // side length of inner pin butterfly mesh, lower surface
+bf_length_upper= pin_d_upper * bf_factor; // side length of inner pin butterfly mesh, upper surface
 
 heater_depth= 5 * m_to_mm_scale; // extension of the heater
 heater_d= 3 * pin_d_lower; // must be bigger than pin_d_lower but smaller than mesh_radius
 heater_r= heater_d/2;
 
-mesh_radius = 5 * pin_d_lower;
+mesh_radius = 20 * pin_d_lower;
 
 rad2deg= Pi/180; // conversion factor as gmsh Cos/Sin functions take radian values
 // ----------------------------------------------------------------------------------- //
@@ -46,7 +46,7 @@ N_radial_heater= 20; // points leading away from pin radially on the heater
 R_radial_heater= 1.1; // Progression
 
 // fluid only
-N_radial_freestream = 5; // points leading away from inner fluid box radially to freestream
+N_radial_freestream = 35; // points leading away from inner fluid box radially to freestream
 R_radial_freestream = 1.0; // points leading away from inner fluid box radially to freestream
 
 // solid only
@@ -311,10 +311,10 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
     // radial outward going between butterfly core and pin interface
     Line(45) = {92, 12};
-    Line(46) = {94, 14};
-    Line(47) = {95, 15};
+    Line(46) = {14, 94};
+    Line(47) = {15, 95};
     Line(48) = {93, 13};
-    Transfinite Line {37,38,39,40,45,46,47,48} = N_pin_solid_radial_outer Using Progression R_pin_solid_radial_outer;
+    Transfinite Line {37,38,39,40,45,-46,-47,48} = N_pin_solid_radial_outer Using Progression R_pin_solid_radial_outer;
 
     // eigth pin, inner butterfly core
     Line(49) = {92, 94};
@@ -339,9 +339,9 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Curve Loop(9) = {40, 21, -48, -56}; Plane Surface(9) = {9};
 
     // solid pin top
-    Curve Loop(10) = {11, -46, -49, 45}; Plane Surface(10) = {10};
-    Curve Loop(11) = {12, -47, -50, 46}; Plane Surface(11) = {11};
-    Curve Loop(12) = {13, -48, -51, 47}; Plane Surface(12) = {12};
+    Curve Loop(10) = {11, 46, -49, 45}; Plane Surface(10) = {10};
+    Curve Loop(11) = {12, 47, -50, -46}; Plane Surface(11) = {11};
+    Curve Loop(12) = {13, -48, -51, -47}; Plane Surface(12) = {12};
     Curve Loop(13) = {52, 49, 50, 51};   Plane Surface(13) = {13};
     Physical Surface("solid_pin_top") = {10,11,12,13};
 
@@ -352,8 +352,8 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
     Curve Loop(17) = {44, 42, -43, -41};Plane Surface(17) = {17};
 
     // pin inner surfaces, do not need naming
-    Curve Loop(18) = {38, 22, -46, -53}; Plane Surface(18) = {18};
-    Curve Loop(19) = {47, -23, -39, 55}; Plane Surface(19) = {19};
+    Curve Loop(18) = {38, 22, 46, -53}; Plane Surface(18) = {18};
+    Curve Loop(19) = {-47, -23, -39, 55}; Plane Surface(19) = {19};
     Curve Loop(20) = {41, 53, -49, -54}; Plane Surface(20) = {20};
     Curve Loop(21) = {50, -55, -43, 53}; Plane Surface(21) = {21};
     Curve Loop(22) = {55, 51, -56, 42};  Plane Surface(22) = {22};
@@ -481,11 +481,3 @@ If (Write_mesh == 1)
     EndIf
 
 EndIf
-//+
-//+
-
-//+
-//+
-//+
-//+
-//+
