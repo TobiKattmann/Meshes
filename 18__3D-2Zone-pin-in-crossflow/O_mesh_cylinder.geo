@@ -81,11 +81,11 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2)
 
     // upper pin
     Point(11) = {0, 0, pin_height, gridsize};
-    Point(12) = {-pin_d_upper, 0, pin_height, gridsize};
-    Point(13) = { pin_d_upper, 0, pin_height, gridsize};
+    Point(12) = {-pin_r_upper, 0, pin_height, gridsize};
+    Point(13) = { pin_r_upper, 0, pin_height, gridsize};
 
-    Point(14) = {-Sin(45*rad2deg)*pin_d_upper, Sin(45*rad2deg)*pin_d_upper, pin_height, gridsize}; // butterly points on the interface
-    Point(15) = { Sin(45*rad2deg)*pin_d_upper, Sin(45*rad2deg)*pin_d_upper, pin_height, gridsize};
+    Point(14) = {-Sin(45*rad2deg)*pin_r_upper, Sin(45*rad2deg)*pin_r_upper, pin_height, gridsize}; // butterly points on the interface
+    Point(15) = { Sin(45*rad2deg)*pin_r_upper, Sin(45*rad2deg)*pin_r_upper, pin_height, gridsize};
 
     Circle(11) = {12,11,14};
     Circle(12) = {14,11,15};
