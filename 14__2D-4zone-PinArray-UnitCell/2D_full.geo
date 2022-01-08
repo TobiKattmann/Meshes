@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
+Which_Mesh_Part= 0; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Add outlet diffusor
 OutletDiffusor= 0; // 0=false, 1=true
 // Evoque Meshing Algorithm?
@@ -16,7 +16,9 @@ Write_mesh= 1; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 // show the FFD corner points
-FFD_corner_point= 1; // 0=false, 1=true
+FFD_corner_point= 0; // 0=false, 1=true
+// Translation in streamwise direction
+number_duplicates= 0;
 
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
@@ -28,6 +30,8 @@ InnerRadiusFactor= 0.3; // Thickness of the pin solid (0.9=small pin wall, 0.1= 
 // Dependent parameters
 rad2deg= Pi/180; // conversion factor as gmsh Cos/Sin functions take radian values
 length= 2 * Cos(30*rad2deg)*dist; // domain length (in x-dir)
+// Derived Parameter for the duplication
+domain_length= length;
 width= Sin(30*rad2deg)*dist; // domain width (in y-dir)
 
 Printf("===================================");
@@ -227,7 +231,10 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
 
     // Physical tags
     Physical Line("fluid_inlet") = {40};
-    If(OutletDiffusor==0) Physical Line("fluid_outlet") = {45}; EndIf //
+    // If #duplicates>0 then the outlet of course has to be the last one
+    If (number_duplicates == 0) 
+        If(OutletDiffusor==0) Physical Line("fluid_outlet") = {45}; EndIf
+    EndIf
     Physical Line("fluid_symmetry") = {41,42,43,44,46,47,48};
     Physical Surface("fluid_surf") = {10,11,12,13,14,15,16};
 
@@ -389,6 +396,93 @@ If (OutletDiffusor == 1)
 
     EndIf
 
+EndIf
+
+// ----------------------------------------------------------------------------------- //
+// Duplicate the whole geometry downstream a couple of times
+If(number_duplicates > 0)
+
+    //Put all Points, Lines and Surfaces in arrays http://onelab.info/pipermail/gmsh/2017/011186.html
+    p[] = Point "*";
+    l[] = Line "*";
+    s[] = Surface "*";
+
+    //Removal of doubled points at stichted surfaces (in/outlet) http://gmsh.info/doc/texinfo/gmsh.html
+    Geometry.AutoCoherence = 0;
+    //Keep meshing iformation on duplicated domain https://stackoverflow.com/questions/49197879/duplicate-structured-surface-mesh-in-gmsh/50079210
+    Geometry.CopyMeshingMethod = 1;
+
+    //Note that for some lines the prescribed Progression of the Transfinite Line is not CopyMeshingMethod
+    //correctly. Simply reversing the Line orientation (i.e. switching points) and reversing the sign in the
+    //following definition fixes the problem.
+    For i In {1:number_duplicates}
+
+        // Translate all points 
+        Translate {i*domain_length, 0, 0} { Duplicata { Point{ p[] }; } }
+
+        If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
+            // Translate Lines: fluid_pin1-3_interface, fluid_symmetry and add to Physical Tag name
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10, 11 }; } };
+            Physical Line("fluid_pin1_interface") += { new_fluid_pin_interface[] };
+
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 20, 21,22 }; } };
+            Physical Line("fluid_pin2_interface") += { new_fluid_pin_interface[] };
+
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 30, 31 }; } };
+            Physical Line("fluid_pin3_interface") += { new_fluid_pin_interface[] };
+
+            new_fluid_sym[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 41,42, 43,44, 46,47,48 }; } };
+            Physical Line("fluid_symmetry") += { new_fluid_sym[] };
+
+            //If it is the last copy, set the outlet marker
+            If (i == number_duplicates)
+                new_outlet[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 45 }; } };
+                Physical Line("outlet") = { new_outlet[] };
+                Printf("Outlet lines: %g , %g", new_outlet[0], new_outlet[1] );
+            EndIf
+
+            //Translate Surface: fluid_body and add to Physical Tag name
+            new_fluid_surf[] = Translate {i*domain_length, 0, 0} { Duplicata { Surface{ 10,11,12,13,14,15,16 }; } };
+            Physical Surface("fluid_surf") += { new_fluid_surf[] };
+        EndIf
+
+        // Duplicate Pins
+        If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
+
+            new_solid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10, 11 }; } };
+            Physical Line("solid_pin1_interface") += { new_solid_pin_interface[] };
+
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 20, 21,22 }; } };
+            Physical Line("solid_pin2_interface") += { new_solid_pin_interface[] };
+
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 30, 31 }; } };
+            Physical Line("solid_pin3_interface") += { new_solid_pin_interface[] };
+
+            new_solid_pin1_inner[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 301, 302 }; } };
+            Physical Line("solid_pin1_inner") += { new_solid_pin1_inner[] };
+
+            new_solid_pin1_walls[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 306, 308 }; } };
+            Physical Line("solid_pin1_walls") += { new_solid_pin1_walls[] };
+
+            new_solid_pin2_inner[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 320, 321, 322 }; } };
+            Physical Line("solid_pin2_inner") += { new_solid_pin2_inner[] };
+
+            new_solid_pin2_walls[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 333, 336 }; } };
+            Physical Line("solid_pin2_walls") += { new_solid_pin2_walls[] };
+
+            new_solid_pin3_inner[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 350, 351 }; } };
+            Physical Line("solid_pin3_inner") += { new_solid_pin3_inner[] };
+
+            new_solid_pin3_walls[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 352, 354 }; } };
+            Physical Line("solid_pin3_walls") += { new_solid_pin3_walls[] };
+
+            new_solid_surf[] = Translate {i*domain_length, 0, 0} { Duplicata { Surface{ 17,18, 19,20,21, 22,23 }; } };
+            Physical Surface("solid_surf") += { new_solid_surf[] };
+
+        EndIf // Solid
+
+    EndFor // Loop duplicates
+    Coherence; // Remove all identical entities
 EndIf
 
 // ------------------------------------------------------------------------- //
