@@ -6,17 +6,13 @@
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 2; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
-// Add outlet diffusor
-OutletDiffusor= 0; // 0=false, 1=true
+Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 1; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
-// show the FFD corner points
-FFD_corner_point= 0; // 0=false, 1=true
 // Translation in streamwise direction
 number_duplicates= 2;
 
@@ -103,35 +99,6 @@ If (r_pin_lower >= width ||
     Abort;
 EndIf
 
-// Show and print possible FFD corner points
-If (FFD_corner_point==1)
-    boxFactor= 1.3;
-
-    xLo= 0.5*length - boxFactor*r_pin_lower;
-    xHi= 0.5*length + boxFactor*r_pin_lower;
-    yLo= 0;
-    yHi= boxFactor*r_pin_lower;
-
-    // counterclockwise from lowest x&y value
-    Printf("===================================");
-    Printf("FFD corner points:");
-    Printf("%g | %g", xLo, yLo);
-    Printf("%g | %g", xHi, yLo);
-    Printf("%g | %g", xHi, yHi);
-    Printf("%g | %g", xLo, yHi);
-    Printf("===================================");
-
-    Point(1000) = {xLo, yLo, 0, gs};
-    Point(1001) = {xHi, yLo, 0, gs};
-    Point(1002) = {xHi, yHi, 0, gs};
-    Point(1003) = {xLo, yHi, 0, gs};
-
-    Line(1000) = {1000,1001};
-    Line(1001) = {1001,1002};
-    Line(1002) = {1002,1003};
-    Line(1003) = {1003,1000};
-EndIf
-
 // ------------------------------------------------------------------------- //
 // CHT Interface, complete description as it is part of fluid and solid
 // Id's starting with in the range (1-99)
@@ -170,14 +137,11 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2 || Whic
 
     //Physical Tags
     If (Which_Mesh_Part==1)
-        Physical Line("fluid_pin1_interface") = {10, 11};
-        Physical Line("fluid_pin2_interface") = {20, 21, 22};
-        Physical Line("fluid_pin3_interface") = {30, 31};
+        Physical Line("fluid_pin_interface") = {10,11, 20,21,22, 30,31};
 
     ElseIf (Which_Mesh_Part==2)
-        Physical Line("solid_pin1_interface") = {10, 11};
-        Physical Line("solid_pin2_interface") = {20, 21, 22};
-        Physical Line("solid_pin3_interface") = {30, 31};
+        Physical Line("solid_pin_interface") = {10,11, 20,21,22, 30,31};
+
 
     EndIf
 
@@ -233,7 +197,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
     Physical Line("fluid_inlet") = {40};
     // If #duplicates>0 then the outlet of course has to be the last one
     If (number_duplicates == 0) 
-        If(OutletDiffusor==0) Physical Line("fluid_outlet") = {45}; EndIf
+        Physical Line("fluid_outlet") = {45};
     EndIf
     Physical Line("fluid_symmetry") = {41,42,43,44,46,47,48};
     Physical Surface("fluid_surf") = {10,11,12,13,14,15,16};
@@ -327,73 +291,8 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
         Physical Line("solid_pin3_inner") = {351,350};
         Physical Line("solid_pin3_walls") = {354};
-        If(OutletDiffusor==0) Physical Line("solid_pin3_outlet") += {352}; EndIf
+        Physical Line("solid_pin3_outlet") += {352};
         Physical Surface("solid_surf") += {22,23};
-
-    EndIf
-
-EndIf
-
-// ------------------------------------------------------------------------- //
-// Outlet Diffusor description (200er range)
-If (OutletDiffusor == 1)
-
-    diffusorLength= 0.005; // length from old to new outlet
-    diffusorShrinkFactor= 0.8; // (new outlet height)/(old outlet height)
-
-    // CHT Interface definition
-    If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1 || Which_Mesh_Part == 2 || Which_Mesh_Part == 3)
-        Point(201) = {length+diffusorLength, (width-r_pin_lower)*diffusorShrinkFactor,0,gs}; // top right
-        Line(200) = {31,201};
-
-        Transfinite Line {200} = N_x_flow*2;
-
-        //Physical Tags
-        If (Which_Mesh_Part==1)
-            Physical Line("fluid_pin3_interface_diffusor") = {200};
-        ElseIf (Which_Mesh_Part==2)
-            Physical Line("solid_pin3_interface_diffusor") = {200};
-        EndIf
-
-    EndIf
-
-    // Fluid Part
-    If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
-        Point(200) = {length+diffusorLength,0,0,gs}; // bottom right
-
-        Line(201) = {45,200};
-        Line(202) = {201,200};  // new outlet
-
-        Curve Loop(24) = {200, 202, -201, 45}; Plane Surface(24) = {24};
-
-        // make structured
-        // No progression in flow direction on the pin surface
-        Transfinite Line {201} = N_x_flow*2;
-        // Progression normal to the pin surface
-        Transfinite Line {202} = N_y_flow Using Progression R_y_flow;
-
-        // Physical tags
-        Physical Line("fluid_outlet") = {202};
-        Physical Line("fluid_symmetry") += {201};
-        Physical Surface("fluid_surf") += {24};
-
-    EndIf
-
-    // Solid Part
-    If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
-        Point(210) = {length+diffusorLength, ((width-r_pin_lower)*diffusorShrinkFactor)+(width-r_pin_lower),0,gs}; // top right
-
-        Line(210) = {341,210};
-        Line(211) = {210,201};
-
-        Curve Loop(25) = {210, 211, -200, -352}; Plane Surface(25) = {25};
-
-        Transfinite Line {210} = N_x_flow*2;
-        Transfinite Line {211} = N_y_innerPin Using Progression R_y_innerPin;
-
-        Physical Line("solid_pin3_inner_diffusor") = {210};
-        Physical Line("solid_pin3_walls") += {211};
-        Physical Surface("solid_surf") += {25};
 
     EndIf
 
@@ -423,14 +322,8 @@ If(number_duplicates > 0)
 
         If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1)
             // Translate Lines: fluid_pin1-3_interface, fluid_symmetry and add to Physical Tag name
-            new_fluid_pin1_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10, 11 }; } };
-            Physical Line("fluid_pin1_interface") += { new_fluid_pin1_interface[] };
-
-            new_fluid_pin2_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 20, 21,22 }; } };
-            Physical Line("fluid_pin2_interface") += { new_fluid_pin2_interface[] };
-
-            new_fluid_pin3_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 30, 31 }; } };
-            Physical Line("fluid_pin3_interface") += { new_fluid_pin3_interface[] };
+            new_fluid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10,11, 20,21,22, 30,31 }; } };
+            Physical Line("fluid_pin_interface") += { new_fluid_pin_interface[] };
 
             new_fluid_sym[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 41,42, 43,44, 46,47,48 }; } };
             Physical Line("fluid_symmetry") += { new_fluid_sym[] };
@@ -450,14 +343,8 @@ If(number_duplicates > 0)
         // Duplicate Pins
         If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
-            new_solid_pin1_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10, 11 }; } };
-            Physical Line("solid_pin1_interface") += { new_solid_pin1_interface[] };
-
-            new_solid_pin2_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 20, 21,22 }; } };
-            Physical Line("solid_pin2_interface") += { new_solid_pin2_interface[] };
-
-            new_solid_pin3_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 30, 31 }; } };
-            Physical Line("solid_pin3_interface") += { new_solid_pin3_interface[] };
+            new_solid_pin_interface[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 10,11, 20,21,22, 30,31 }; } };
+            Physical Line("solid_pin_interface") += { new_solid_pin_interface[] };
 
             new_solid_pin1_inner[] = Translate {i*domain_length, 0, 0} { Duplicata { Line{ 301, 302 }; } };
             Physical Line("solid_pin1_inner") += { new_solid_pin1_inner[] };
@@ -510,21 +397,11 @@ If (Write_mesh == 1)
 
     Mesh.Format = 42; // .su2 mesh format,
     If (Which_Mesh_Part == 1)
-        If (OutletDiffusor==0)
-            Save "fluid.su2";
-        Else
-            Save "fluid_diffusor.su2";
-        EndIf
-
+        Save "fluid.su2";
     ElseIf (Which_Mesh_Part == 2)
-        If (OutletDiffusor==0)
-            Save "solid.su2";
-        Else
-            Save "solid_diffusor.su2";
-        EndIf
-
+         Save "solid.su2";
     Else
-        Printf("Unvalid Which_Mesh_Part variable for output writing.");
+        Printf("Invalid Which_Mesh_Part variable for output writing.");
         Abort;
     EndIf
 
