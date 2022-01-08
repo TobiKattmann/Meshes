@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 0; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
+Which_Mesh_Part= 2; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Add outlet diffusor
 OutletDiffusor= 0; // 0=false, 1=true
 // Evoque Meshing Algorithm?
@@ -18,7 +18,7 @@ Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 // show the FFD corner points
 FFD_corner_point= 0; // 0=false, 1=true
 // Translation in streamwise direction
-number_duplicates= 0;
+number_duplicates= 2;
 
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
@@ -255,15 +255,15 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
         // pin 1 additional lines
         Line(306) = {301, 11};
-        Line(307) = {302, 12};
+        Line(307) = {12, 302};
         Line(308) = {303, 13};
 
-        Curve Loop(17) = {306, 10, -307, -301}; Surface(17) = {17};
-        Curve Loop(18) = {302, 308, -11, -307}; Surface(18) = {18};
+        Curve Loop(17) = {306, 10, 307, -301}; Surface(17) = {17};
+        Curve Loop(18) = {302, 308, -11, 307}; Surface(18) = {18};
 
         Transfinite Line {302} = N_x_flow;
         Transfinite Line {301} = N_x_flow/2;
-        Transfinite Line {306,307,308} = N_y_innerPin Using Progression R_y_innerPin;
+        Transfinite Line {306,-307,308} = N_y_innerPin Using Progression R_y_innerPin;
 
         Physical Line("solid_pin1_inner") = {301,302};
         Physical Line("solid_pin1_walls") = {306,308};
@@ -285,16 +285,16 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
         // pin 2 additional connecting lines
         Line(333) = {21, 321}; // lower
-        Line(334) = {22, 322};
+        Line(334) = {322, 22};
         Line(335) = {23, 323};
         Line(336) = {24, 324};
 
-        Curve Loop(19) = {333, 320, -334, -20}; Surface(19) = {19};
-        Curve Loop(20) = {21, 335, -321, -334}; Surface(20) = {20};
+        Curve Loop(19) = {333, 320, 334, -20}; Surface(19) = {19};
+        Curve Loop(20) = {21, 335, -321, 334}; Surface(20) = {20};
         Curve Loop(21) = {322, -336, -22, 335}; Surface(21) = {21};
 
         // structured parts
-        Transfinite Line {-333, -334, -335, -336} = N_y_innerPin Using Progression R_y_innerPin; // lines pointing into circle midpoint
+        Transfinite Line {-333, 334, -335, -336} = N_y_innerPin Using Progression R_y_innerPin; // lines pointing into circle midpoint
         Transfinite Line {320, 321, 322} = N_x_flow; // circle arcs
 
         Physical Line("solid_pin2_inner") = {320,321,322};
@@ -314,15 +314,15 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
         // pin 3 additional connecting lines
         Line(352) = {341, 31};
-        Line(353) = {342, 32};
+        Line(353) = {32, 342};
         Line(354) = {343, 33};
 
-        Curve Loop(22) = {354, -31, -353, 351}; Surface(22) = {22};
-        Curve Loop(23) = {350, 353, -30, -352}; Surface(23) = {23};
+        Curve Loop(22) = {354, -31, 353, 351}; Surface(22) = {22};
+        Curve Loop(23) = {350, -353, -30, -352}; Surface(23) = {23};
 
         Transfinite Line {351} = N_x_flow;
         Transfinite Line {350} = N_x_flow/2;
-        Transfinite Line {352,353,354} = N_y_innerPin Using Progression R_y_innerPin;
+        Transfinite Line {352,-353,354} = N_y_innerPin Using Progression R_y_innerPin;
 
         Physical Line("solid_pin3_inner") = {351,350};
         Physical Line("solid_pin3_walls") = {354};
