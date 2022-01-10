@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 1; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
+Which_Mesh_Part= 2; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
@@ -14,7 +14,7 @@ Write_mesh= 1; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 // Translation in streamwise direction
-number_duplicates= 2;
+number_duplicates= 0;
 
 // Free parameters
 scale_factor= 1e-3; // scales Point positions from [mm] to [m] with 1e-3
@@ -278,20 +278,23 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
         Circle(351) = {342, 30, 343};
 
         // pin 3 additional connecting lines
-        Line(352) = {341, 31};
+        Line(352) = {31, 341};
         Line(353) = {32, 342};
         Line(354) = {343, 33};
 
         Curve Loop(22) = {354, -31, 353, 351}; Surface(22) = {22};
-        Curve Loop(23) = {350, -353, -30, -352}; Surface(23) = {23};
+        Curve Loop(23) = {350, -353, -30, 352}; Surface(23) = {23};
 
         Transfinite Line {351} = N_x_flow;
         Transfinite Line {350} = N_x_flow/2;
-        Transfinite Line {352,-353,354} = N_y_innerPin Using Progression R_y_innerPin;
+        Transfinite Line {-352,-353,354} = N_y_innerPin Using Progression R_y_innerPin;
 
         Physical Line("solid_pin3_inner") = {351,350};
         Physical Line("solid_pin3_walls") = {354};
-        Physical Line("solid_pin3_outlet") += {352};
+        // If #duplicates>0 then the outlet of course has to be the last one
+        If (number_duplicates == 0) 
+            Physical Line("solid_pin3_outlet") = {352};
+        EndIf
         Physical Surface("solid_surf") += {22,23};
 
     EndIf
@@ -331,7 +334,7 @@ If(number_duplicates > 0)
             //If it is the last copy, set the outlet marker
             If (i == number_duplicates)
                 new_outlet[] = Translate {i*domain_length, 0, 0} { Duplicata { Line { 45 }; } };
-                Physical Line("outlet") = { new_outlet[] };
+                Physical Line("fluid_outlet") = { new_outlet[] };
                 Printf("Outlet lines: %g , %g", new_outlet[0], new_outlet[1] );
             EndIf
 
