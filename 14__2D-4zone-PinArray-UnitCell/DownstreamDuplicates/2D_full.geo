@@ -2,15 +2,15 @@
 // T. Kattmann, 18.06.2019, 2D 2 Zone mesh
 // Create the mesh by calling this geo file with 'gmsh <this>.geo'.
 // For multizone mesh the zonal meshes have to be created using the first 
-// option 'Which_Mesh_Part' below and have to be married appropriatley.
+// option 'Which_Mesh_Part' below and have to be married appropriately.
 // ------------------------------------------------------------------------- //
 
 // Which domain part should be handled
-Which_Mesh_Part= 2; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
-// Evoque Meshing Algorithm?
+Which_Mesh_Part= 0; // 0=all, 1=Fluid, 2=Solid, 3=InterfaceOnly
+// Evoke Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
-Write_mesh= 1; // 0=false, 1=true
+Write_mesh= 0; // 0=false, 1=true
 // Mesh Resolution
 Mesh_Resolution= 2; // 0=debugRes, 1=Res1, 2=Res2
 // Translation in streamwise direction
@@ -402,7 +402,7 @@ If (Write_mesh == 1)
     If (Which_Mesh_Part == 1)
         Save "fluid.su2";
     ElseIf (Which_Mesh_Part == 2)
-         Save "solid.su2";
+        Save "solid.su2";
     Else
         Printf("Invalid Which_Mesh_Part variable for output writing.");
         Abort;
