@@ -23,13 +23,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="350.3714"
-     inkscape:cy="774.98901"
+     inkscape:zoom="1"
+     inkscape:cx="423.49999"
+     inkscape:cy="380.99999"
      inkscape:window-width="1920"
      inkscape:window-height="1135"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="224"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -365,6 +365,32 @@
        sodipodi:open="true"
        sodipodi:arc-type="arc"
        d="m 54.438052,154.77224 a 18.435011,19.10774 0 0 1 18.422994,-18.34041 18.435011,19.10774 0 0 1 18.417515,18.34632" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000005;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2630-0-4"
+       sodipodi:type="arc"
+       sodipodi:cx="186.43056"
+       sodipodi:cy="152.90274"
+       sodipodi:rx="18.435011"
+       sodipodi:ry="19.10774"
+       sodipodi:start="3.1817613"
+       sodipodi:end="6.2433262"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 168.01042,152.13541 a 18.435011,19.10774 0 0 1 18.42299,-18.34041 18.435011,19.10774 0 0 1 18.41752,18.34632" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000005;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2630-0-4-1"
+       sodipodi:type="arc"
+       sodipodi:cx="186.43062"
+       sodipodi:cy="152.46188"
+       sodipodi:rx="7.8431954"
+       sodipodi:ry="8.1294088"
+       sodipodi:start="3.1817613"
+       sodipodi:end="6.2433262"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 178.59375,152.13542 a 7.8431954,8.1294088 0 0 1 7.83808,-7.80295 7.8431954,8.1294088 0 0 1 7.83575,7.80547" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000005;stroke-width:0.3;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path2630-7-4"
@@ -718,6 +744,32 @@
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 56.885417,112.44792 v 2.64583"
        id="path146148-4" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 168.01042,157.16251 v 2.64583"
+       id="path146144-2-2" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 168.01042,158.48542 18.52083,0"
+       id="path146146-8-9"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 186.53124,157.16251 v 2.64583"
+       id="path146148-4-3" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 178.59381,152.92918 v 2.64583"
+       id="path146144-2-2-9" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 178.59375,154.25209 7.9375,0"
+       id="path146146-8-9-0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 186.53123,152.92918 v 2.64583"
+       id="path146148-4-3-8" />
     <text
        xml:space="preserve"
        style="font-size:2.82222px;line-height:1.25;font-family:sans-serif;stroke-width:0.264583"
@@ -1345,5 +1397,56 @@
          x="129.64583"
          y="236.45552"
          id="tspan31475">3Boxes -&gt; 135 DOF's in the  optimization</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 168.01041,152.13541 h 10.58334"
+       id="path1149" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 194.46875,152.13541 h 10.58333"
+       id="path1151" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';stroke-width:0.264583"
+       x="178.87973"
+       y="153.38817"
+       id="text5301"><tspan
+         sodipodi:role="line"
+         id="tspan5299"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="178.87973"
+         y="153.38817">0.0006</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';stroke-width:0.264583"
+       x="174.14345"
+       y="157.84886"
+       id="text7615"><tspan
+         sodipodi:role="line"
+         id="tspan7613"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="174.14345"
+         y="157.84886">0.002</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';stroke-width:0.264583"
+       x="191.21948"
+       y="156.5033"
+       id="text17477"><tspan
+         sodipodi:role="line"
+         id="tspan17475"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="191.21948"
+         y="156.5033">pin-arc-length= r*2*pi</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="191.21948"
+         y="159.14914"
+         id="tspan19903">inner= 0.0006*2*pi =0.0037699112</tspan><tspan
+         sodipodi:role="line"
+         style="font-size:2.11667px;stroke-width:0.264583"
+         x="191.21948"
+         y="161.79497"
+         id="tspan19905">outer= 0.002*2*pi   =0.012566370614</tspan></text>
   </g>
 </svg>
