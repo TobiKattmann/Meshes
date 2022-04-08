@@ -7,11 +7,13 @@
 // Create fluid and solid mesh seperately and merge together e.g. by hand.
 
 // Which domain part should be handled
-Which_Mesh_Part= 1;// 0=all, 1=Fluid, 2=Solid
+Which_Mesh_Part= 0;// 0=all, 1=Fluid, 2=Solid
 // Evoke Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .su2 format
 Write_mesh= 1; // 0=false, 1=true
+// Mesh Resolution
+Mesh_Resolution= 1; // 0=debugRes, 1=paperRes
 
 //Geometric inputs
 cylinder_diameter = 1;
@@ -22,13 +24,23 @@ inner_pin_r = inner_pin_d/2;
 
 // ----------------------------------------------------------------------------------- //
 //Mesh inputs
-gridsize = 0.1;
-Ncylinder = 40;
-Nradial = 50;
-Rradial = 1.15;
+If(Mesh_Resolution==0) // debugRes
+    gridsize = 0.1;
+    Ncylinder = 40;
+    Nradial = 50;
+    Rradial = 1.15;
 
-NPinRadial = 10;
-RPinRadial = 0.91;
+    NPinRadial = 10;
+    RPinRadial = 0.91;
+ElseIf(Mesh_Resolution==1) // paperRes
+    gridsize = 0.01;
+    Ncylinder = 202/2;
+    Nradial = 112;
+    Rradial = 1.06;
+
+    NPinRadial = 25;
+    RPinRadial = 0.90;
+EndIf
 
 // Each zone is self-sufficient (i.e. has all of its own Points/Lines etc.)
 // ----------------------------------------------------------------------------------- //
