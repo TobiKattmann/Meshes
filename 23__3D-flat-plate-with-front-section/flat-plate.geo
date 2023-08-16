@@ -5,10 +5,10 @@
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .cgns format
-Write_mesh= 1; // 0=false, 1=true
+Write_mesh= 0; // 0=false, 1=true
 mesh_name= "flatplate.cgns";
 // Control the number of cells and progression parameters
-Mesh_parameter= 2;
+Mesh_parameter= 4;
 
 // The flat plate consists out of a front section and a back section,
 // where the front bottom is designated sym and the back bottom is no-slip.
@@ -62,6 +62,40 @@ ElseIf (Mesh_parameter == 2)
   Point(100)  = {xstart, 1.6e-5, zmax, gridsize};
   Point(101)  = {xstart + 1e-3, 0, zmax, gridsize};
   Point(102)  = {xstart - 1e-3, 0, zmax, gridsize};
+ElseIf (Mesh_parameter == 3)
+  // Compared to Mesh_parameter==1 this should have half the points and double first cell height.
+  // I.e. 33x33
+  Nx_front = 17;
+  Rx_front = 1.08;
+
+  Nx_back = 17;
+  Rx_back = 1.26;
+
+  Ny = 33;
+  Ry = 1.17;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100)  = {xstart, 2*1.6e-5, zmax, gridsize};
+  Point(101)  = {xstart + 2*1e-3, 0, zmax, gridsize};
+  Point(102)  = {xstart - 2*1e-3, 0, zmax, gridsize};
+ElseIf (Mesh_parameter == 4)
+  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
+  // I.e. 130x130
+  Nx_front = 65;
+  Rx_front = 1.02;
+
+  Nx_back = 65;
+  Rx_back = 1.06;
+
+  Ny = 130;
+  Ry = 1.04;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100)  = {xstart, 0.5*1.6e-5, zmax, gridsize};
+  Point(101)  = {xstart + 0.5*1e-3, 0, zmax, gridsize};
+  Point(102)  = {xstart - 0.5*1e-3, 0, zmax, gridsize};
 EndIf
 // ----------------------------------------------------------------------------------- //
 // front/freestream points
@@ -73,8 +107,6 @@ Point(4)  = {xmin, ymax, zmin, gridsize};
 // additional back/no-slip points
 Point(5)  = {xmax, ymin, zmin, gridsize}; 
 Point(6)  = {xmax, ymax, zmin, gridsize};
-
-
 
 // front box lines
 Line(1)  = {1,2};
