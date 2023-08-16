@@ -1,14 +1,14 @@
 // ----------------------------------------------------------------------------------- //
-// Kattmann 15.08.2023, flat plate mesh (simple extrusion in 3rd dimension)
+// Kattmann 15.08.2023, flat plate mesh (simple 1cell extrusion in 3rd dimension)
 // ----------------------------------------------------------------------------------- //
 
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .cgns format
-Write_mesh= 0; // 0=false, 1=true
+Write_mesh= 1; // 0=false, 1=true
 mesh_name= "flatplate.cgns";
 // Control the number of cells and progression parameters
-Mesh_parameter= 4;
+Mesh_parameter= 5;
 
 // The flat plate consists out of a front section and a back section,
 // where the front bottom is designated sym and the back bottom is no-slip.
@@ -29,8 +29,9 @@ If (Mesh_parameter == 1)
   // This is equivalent to the SU2 mesh mesh_flatplate_65x65.su2
   // 1st cell height is 1.6e-5m with a mild progression
   // First Cell width at x=0 in x-direction is 1e-3m, again mild progression
+  mesh_name = "lam_flatplate_medium_65x65.cgns";
   Nx_front = 33;
-  Rx_front = 1.04   ; 
+  Rx_front = 1.04;
 
   Nx_back = 33;
   Rx_back = 1.12;
@@ -40,16 +41,18 @@ If (Mesh_parameter == 1)
   Nz = 2;
 
   // Helper Points to dial in mesh sizing
-  Point(100)  = {xstart, 1.6e-5, zmax, gridsize};
-  Point(101)  = {xstart + 1e-3, 0, zmax, gridsize};
-  Point(102)  = {xstart - 1e-3, 0, zmax, gridsize};
+  Point(100) = {xstart, 1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 1e-3, 0, zmax, gridsize};
 ElseIf (Mesh_parameter == 2)
-  // Goal here to is to have 
+  // Goal here to is to have
   // 1. a finer mesh in x-direction near the leading edge of the flat plate
   // 2. a finer mesh in x-direction near the outlet
   // -> this is best done with a Bump instead of Progression for the wall
+  // So this mesh is 132x65
+  mesh_name= "lam_flatplate_medium_outletRefined_132x65.cgns";
   Nx_front = 33;
-  Rx_front = 1.04   ; 
+  Rx_front = 1.04;
 
   Nx_back = 100;
   Rx_back = 0.025;
@@ -59,12 +62,13 @@ ElseIf (Mesh_parameter == 2)
   Nz = 2;
 
   // Helper Points to dial in mesh sizing
-  Point(100)  = {xstart, 1.6e-5, zmax, gridsize};
-  Point(101)  = {xstart + 1e-3, 0, zmax, gridsize};
-  Point(102)  = {xstart - 1e-3, 0, zmax, gridsize};
+  Point(100) = {xstart, 1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 1e-3, 0, zmax, gridsize};
 ElseIf (Mesh_parameter == 3)
   // Compared to Mesh_parameter==1 this should have half the points and double first cell height.
   // I.e. 33x33
+  mesh_name= "lam_flatplate_coarse_33x33.cgns";
   Nx_front = 17;
   Rx_front = 1.08;
 
@@ -76,36 +80,55 @@ ElseIf (Mesh_parameter == 3)
   Nz = 2;
 
   // Helper Points to dial in mesh sizing
-  Point(100)  = {xstart, 2*1.6e-5, zmax, gridsize};
-  Point(101)  = {xstart + 2*1e-3, 0, zmax, gridsize};
-  Point(102)  = {xstart - 2*1e-3, 0, zmax, gridsize};
+  Point(100) = {xstart, 2*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 2*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 2*1e-3, 0, zmax, gridsize};
 ElseIf (Mesh_parameter == 4)
   // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
-  // I.e. 130x130
-  Nx_front = 65;
+  // I.e. 131x131
+  mesh_name= "lam_flatplate_fine_131x131.cgns";
+  Nx_front = 66;
   Rx_front = 1.02;
 
-  Nx_back = 65;
+  Nx_back = 66;
   Rx_back = 1.06;
 
-  Ny = 130;
+  Ny = 131;
   Ry = 1.04;
   Nz = 2;
 
   // Helper Points to dial in mesh sizing
-  Point(100)  = {xstart, 0.5*1.6e-5, zmax, gridsize};
-  Point(101)  = {xstart + 0.5*1e-3, 0, zmax, gridsize};
-  Point(102)  = {xstart - 0.5*1e-3, 0, zmax, gridsize};
+  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
+ElseIf (Mesh_parameter == 5)
+  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
+  // I.e. 131x131
+  mesh_name= "lam_flatplate_finest_263x263.cgns";
+  Nx_front = 132;
+  Rx_front = 1.001;
+
+  Nx_back = 132;
+  Rx_back = 1.02;
+
+  Ny = 263;
+  Ry = 1.015;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
 EndIf
 // ----------------------------------------------------------------------------------- //
 // front/freestream points
-Point(1)  = {xmin, ymin, zmin, gridsize}; 
-Point(2)  = {xstart, ymin, zmin, gridsize}; 
+Point(1)  = {xmin, ymin, zmin, gridsize};
+Point(2)  = {xstart, ymin, zmin, gridsize};
 Point(3)  = {xstart, ymax, zmin, gridsize};
 Point(4)  = {xmin, ymax, zmin, gridsize};
 
 // additional back/no-slip points
-Point(5)  = {xmax, ymin, zmin, gridsize}; 
+Point(5)  = {xmax, ymin, zmin, gridsize};
 Point(6)  = {xmax, ymax, zmin, gridsize};
 
 // front box lines
@@ -173,8 +196,8 @@ EndIf
 // // ----------------------------------------------------------------------------------- //
 // Write .cgns meshfile
 If (Write_mesh == 1)
-    
-    Mesh.Format = 32; // .cgns mesh format 
+
+    Mesh.Format = 32; // .cgns mesh format
     Save Str(mesh_name);
 
 EndIf
