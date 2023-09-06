@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------------- //
 // Kattmann 15.08.2023, flat plate mesh (simple cell extrusion in 3rd dimension)
 // ----------------------------------------------------------------------------------- //
+// NOTE: Call `gmsh <filename>.geo -0` to avoid openeing the GUI.
 
 // Evoque Meshing Algorithm?
 Do_Meshing= 1; // 0=false, 1=true
