@@ -1,21 +1,23 @@
 // ----------------------------------------------------------------------------------- //
-// Kattmann 15.08.2023, flat plate mesh (simple cell extrusion in 3rd dimension)
+// Kattmann 15.08.2023, Flat plate mesh (simple cell extrusion in 3rd dimension)
 // ----------------------------------------------------------------------------------- //
-// NOTE: Call `gmsh <filename>.geo -0` to avoid openeing the GUI.
+// NOTE: Call `gmsh <filename>.geo -0` to avoid opening the GUI.
 
-// Evoque Meshing Algorithm?
+// Create a mesh?
 Do_Meshing= 1; // 0=false, 1=true
 // Write Mesh files in .cgns format
 Write_mesh= 1; // 0=false, 1=true
 Mesh_format= 1; // 0=cgns, 1=su2
-mesh_name= "lam_flatplate";
+mesh_name= "lam_flatplate"; // basename
 // Control the number of cells and progression parameters
 Mesh_parameter= 1;
 
+// ----------------------------------------------------------------------------------- //
+// Geometrical inputs
+//
 // The flat plate consists out of a front section and a back section,
 // where the front bottom is designated sym and the back bottom is no-slip.
 // The start of the no-slip part is at x=0, (or at the origin to be precise)
-// Geometric inputs:
 xstart = 0.0;
 xmin = -0.06096; // must be <0
 xmax = 0.3048; // must be >0
@@ -25,7 +27,7 @@ zmin = 0.0;
 zmax = 0.01;
 
 // ----------------------------------------------------------------------------------- //
-//Mesh inputs
+// Mesh inputs
 gridsize = 0.1; // not relevant for fully structured grid, but we still have to provide it
 numberLayers = 1; // Number of layers in z-direction, 1 for the most efficient quasi 2D setup.
 
@@ -54,7 +56,7 @@ ElseIf (Mesh_parameter == 2)
   // 2. a finer mesh in x-direction near the outlet
   // -> this is best done with a Bump instead of Progression for the wall
   // So this mesh is 132x65
-  mesh_name= mesh_name = StrCat(mesh_name, "_medium_outletRefined_132x65");
+  mesh_name = StrCat(mesh_name, "_medium_outletRefined_132x65");
   Nx_front = 33;
   Rx_front = 1.04;
 
@@ -72,7 +74,7 @@ ElseIf (Mesh_parameter == 2)
 ElseIf (Mesh_parameter == 3)
   // Compared to Mesh_parameter==1 this should have half the points and double first cell height.
   // I.e. 33x33
-  mesh_name= mesh_name = StrCat(mesh_name, "_coarse_33x33");
+  mesh_name = StrCat(mesh_name, "_coarse_33x33");
   Nx_front = 17;
   Rx_front = 1.08;
 
@@ -90,7 +92,7 @@ ElseIf (Mesh_parameter == 3)
 ElseIf (Mesh_parameter == 4)
   // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
   // I.e. 131x131
-  mesh_name= mesh_name = StrCat(mesh_name, "_fine_131x131");
+  mesh_name = StrCat(mesh_name, "_fine_131x131");
   Nx_front = 66;
   Rx_front = 1.02;
 
@@ -108,7 +110,7 @@ ElseIf (Mesh_parameter == 4)
 ElseIf (Mesh_parameter == 5)
   // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
   // I.e. 131x131
-  mesh_name= mesh_name = StrCat(mesh_name, "_finest_263x263");
+  mesh_name = StrCat(mesh_name, "_finest_263x263");
   Nx_front = 132;
   Rx_front = 1.001;
 
@@ -159,6 +161,7 @@ Extrude {0, 0, zmax} {
   Layers{numberLayers};
   Recombine; // Necessary create structured hex-mesh
 }
+Coherence;
 
 Physical Surface("zplus", 52) = {29, 51};
 Physical Surface("zminus", 53) = {2, 1};
@@ -196,20 +199,19 @@ If (Do_Meshing == 1)
 EndIf
 
 // ----------------------------------------------------------------------------------- //
-// Write .cgns meshfile
+// Write mesh
 If (Write_mesh == 1)
   If (Mesh_format == 0)
     // 32 = .cgns
     Mesh.Format = 32;
     mesh_name = StrCat(mesh_name, ".cgns");
-    Save Str(mesh_name);
 
   ElseIf (Mesh_format == 1)
     // 42 = .su2 
     Mesh.Format = 42;
     mesh_name = StrCat(mesh_name, ".su2");
-    Save Str(mesh_name);
 
   EndIf
+  Save Str(mesh_name);
 
 EndIf
