@@ -31,7 +31,26 @@ zmax = 0.01;
 gridsize = 0.1; // not relevant for fully structured grid, but we still have to provide it
 numberLayers = 1; // Number of layers in z-direction, 1 for the most efficient quasi 2D setup.
 
-If (Mesh_parameter == 1)
+If (Mesh_parameter == 0)
+  // Compared to Mesh_parameter==1 this should have half the points and double first cell height.
+  // I.e. 33x33
+  mesh_name = StrCat(mesh_name, "_coarse_33x33");
+  Nx_front = 17;
+  Rx_front = 1.08;
+
+  Nx_back = 17;
+  Rx_back = 1.26;
+
+  Ny = 33;
+  Ry = 1.17;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100) = {xstart, 2*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 2*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 2*1e-3, 0, zmax, gridsize};
+
+ElseIf (Mesh_parameter == 1)
   // This is equivalent to the SU2 mesh mesh_flatplate_65x65.su2
   // 1st cell height is 1.6e-5m with a mild progression
   // First Cell width at x=0 in x-direction is 1e-3m, again mild progression
@@ -50,7 +69,46 @@ If (Mesh_parameter == 1)
   Point(100) = {xstart, 1.6e-5, zmax, gridsize};
   Point(101) = {xstart + 1e-3, 0, zmax, gridsize};
   Point(102) = {xstart - 1e-3, 0, zmax, gridsize};
+
 ElseIf (Mesh_parameter == 2)
+  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
+  // I.e. 131x131
+  mesh_name = StrCat(mesh_name, "_fine_131x131");
+  Nx_front = 66;
+  Rx_front = 1.02;
+
+  Nx_back = 66;
+  Rx_back = 1.06;
+
+  Ny = 131;
+  Ry = 1.04;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
+
+ElseIf (Mesh_parameter == 3)
+  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
+  // I.e. 131x131
+  mesh_name = StrCat(mesh_name, "_finest_263x263");
+  Nx_front = 132;
+  Rx_front = 1.001;
+
+  Nx_back = 132;
+  Rx_back = 1.02;
+
+  Ny = 263;
+  Ry = 1.015;
+  Nz = 2;
+
+  // Helper Points to dial in mesh sizing
+  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
+  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
+  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
+
+ElseIf (Mesh_parameter == 4)
   // Goal here to is to have
   // 1. a finer mesh in x-direction near the leading edge of the flat plate
   // 2. a finer mesh in x-direction near the outlet
@@ -71,60 +129,7 @@ ElseIf (Mesh_parameter == 2)
   Point(100) = {xstart, 1.6e-5, zmax, gridsize};
   Point(101) = {xstart + 1e-3, 0, zmax, gridsize};
   Point(102) = {xstart - 1e-3, 0, zmax, gridsize};
-ElseIf (Mesh_parameter == 3)
-  // Compared to Mesh_parameter==1 this should have half the points and double first cell height.
-  // I.e. 33x33
-  mesh_name = StrCat(mesh_name, "_coarse_33x33");
-  Nx_front = 17;
-  Rx_front = 1.08;
 
-  Nx_back = 17;
-  Rx_back = 1.26;
-
-  Ny = 33;
-  Ry = 1.17;
-  Nz = 2;
-
-  // Helper Points to dial in mesh sizing
-  Point(100) = {xstart, 2*1.6e-5, zmax, gridsize};
-  Point(101) = {xstart + 2*1e-3, 0, zmax, gridsize};
-  Point(102) = {xstart - 2*1e-3, 0, zmax, gridsize};
-ElseIf (Mesh_parameter == 4)
-  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
-  // I.e. 131x131
-  mesh_name = StrCat(mesh_name, "_fine_131x131");
-  Nx_front = 66;
-  Rx_front = 1.02;
-
-  Nx_back = 66;
-  Rx_back = 1.06;
-
-  Ny = 131;
-  Ry = 1.04;
-  Nz = 2;
-
-  // Helper Points to dial in mesh sizing
-  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
-  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
-  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
-ElseIf (Mesh_parameter == 5)
-  // Compared to Mesh_parameter==1 this should have double the points and half first cell height.
-  // I.e. 131x131
-  mesh_name = StrCat(mesh_name, "_finest_263x263");
-  Nx_front = 132;
-  Rx_front = 1.001;
-
-  Nx_back = 132;
-  Rx_back = 1.02;
-
-  Ny = 263;
-  Ry = 1.015;
-  Nz = 2;
-
-  // Helper Points to dial in mesh sizing
-  Point(100) = {xstart, 0.5*1.6e-5, zmax, gridsize};
-  Point(101) = {xstart + 0.5*1e-3, 0, zmax, gridsize};
-  Point(102) = {xstart - 0.5*1e-3, 0, zmax, gridsize};
 EndIf
 
 // ----------------------------------------------------------------------------------- //
@@ -207,7 +212,7 @@ If (Write_mesh == 1)
     mesh_name = StrCat(mesh_name, ".cgns");
 
   ElseIf (Mesh_format == 1)
-    // 42 = .su2 
+    // 42 = .su2
     Mesh.Format = 42;
     mesh_name = StrCat(mesh_name, ".su2");
 

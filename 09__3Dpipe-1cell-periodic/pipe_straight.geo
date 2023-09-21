@@ -78,7 +78,7 @@ ElseIf (Mesh_parameter == 3)
     // #FacePoints = (Nbox-1)**2 + 4*(Nbox-1)*(Ncircu-1)
     mesh_name = StrCat(mesh_name, "_finest_14080x200");
 ElseIf (Mesh_parameter == 4)
-    // Pipe Slice with 1 cell in downstream direction. Meant for periodic BC's. 
+    // Pipe Slice with 1 cell in downstream direction. Meant for periodic BC's.
     Radius= 0.5e-2; // Pipe Radius
     InnerBox= Radius/3; // Distance to the inner Block of the butterfly mesh
 
@@ -157,7 +157,7 @@ Recombine Surface{1,2,3,4,5};
 Extrude {0, 0, pipe_length} {
     Surface{1}; Surface{2}; Surface{3}; Surface{4}; Surface{5};
     Layers{Npipe};
-    Recombine; 
+    Recombine;
 }
 Coherence;
 
@@ -184,7 +184,7 @@ If (Write_mesh == 1)
     mesh_name = StrCat(mesh_name, ".cgns");
 
   ElseIf (Mesh_format == 1)
-    Mesh.Format = 42; // 42 = .su2 
+    Mesh.Format = 42; // 42 = .su2
     mesh_name = StrCat(mesh_name, ".su2");
 
   EndIf
