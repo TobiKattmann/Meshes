@@ -62,7 +62,7 @@ If(Mesh_Resolution==0) // debugRes
     R_z_flow= 0.05; // Bump in height as top and bottom are walls
 
     // Additional meshing parameters for solid domain
-    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1. 
+    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1.
     N_y_innerPin= 5; // #gridpoints of the structured first part of the inner Pin in y-direction / normal to the pin
     R_y_innerPin= 0.93; // Progression towards interface
     N_z_solid= 10; // #points from bottom interface to heater surface
@@ -79,7 +79,7 @@ ElseIf(Mesh_Resolution==1) // Res1
     R_z_flow= 0.05; // Bump in height as top and bottom are walls
 
     // Additional meshing parameters for solid domain
-    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1. 
+    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1.
     N_y_innerPin= 30; // #gridpoints of the structured first part of the inner Pin in y-direction / normal to the pin
     R_y_innerPin= 0.93; // Progression towards interface
     N_z_solid= 20; // #points from bottom interface to heater surface
@@ -96,7 +96,7 @@ ElseIf(Mesh_Resolution==2) // Res2
     R_z_flow= 0.05; // Bump in height as top and bottom are walls
 
     // Additional meshing parameters for solid domain
-    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1. 
+    InnerRadiusFactor= 0.6; // How much of the inner pin is unstructured mesh (0.9=mostly unstructured, 0.1= mostly structured). Requires 0 < value < 1.
     N_y_innerPin= 40; // #gridpoints of the structured first part of the inner Pin in y-direction / normal to the pin
     R_y_innerPin= 0.93; // Progression towards interface
     N_z_solid= 30; // #points from bottom interface to heater surface
@@ -105,7 +105,7 @@ ElseIf(Mesh_Resolution==2) // Res2
 EndIf
 
 // Feasability checks
-If (r_pin_lower >= width || 
+If (r_pin_lower >= width ||
     r_pin_upper >= width ||
     r_pin_lower <= 0 ||
     r_pin_upper <= 0)
@@ -115,7 +115,7 @@ EndIf
 
 // ------------------------------------------------------------------------- //
 // Point distribution rules:
-// Line/curve orientation rules (in that order): 
+// Line/curve orientation rules (in that order):
 //   1. always pointing in positive z-direction
 //   2. in x-y-plane, always pointing in positive x-direction
 //   3. in y-direction, always pointing in positive y-direction
@@ -192,7 +192,7 @@ Line Loop(16) = {44, 45, 30, -54}; Plane Surface(16) = {16};
 Transfinite Line {11,50,20,47,21,22,53,31} = N_x_flow;
 Transfinite Line {10,41,30,44} = N_x_flow/2;
 // Progression normal to the pin surface
-Transfinite Line {40, -49, -48, -42, 51, 52, -43, 46, -54, -45} = N_y_flow Using Progression R_y_flow; 
+Transfinite Line {40, -49, -48, -42, 51, 52, -43, 46, -54, -45} = N_y_flow Using Progression R_y_flow;
 
 // Upper Pin1
 Point(10+100) = {0, width, upper_h, gs}; // lower pin1 midpoint
@@ -325,7 +325,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 1) // fluid only
     Line(163) = {45, 145};
     Line(164) = {42, 142};
     Line(165) = {40, 140};
-    Transfinite Line {160,161,162,163,164,165} = N_z_flow Using Bump 0.1;
+    Transfinite Line {160,161,162,163,164,165} = N_z_flow Using Bump R_z_flow;
 
     // Side-faces
     Line Loop(117) = {61, 140, -160, -40}; Surface(117) = {117};
@@ -367,10 +367,10 @@ EndIf
 // ------------------------------------------------------------------------- //
 // Solid only description
 If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
-    
+
     If (1==1) // Pin 1 Solid
         // Solid inner pin 1 and bottom300-er range
-        // pin 1 lower 
+        // pin 1 lower
         Point(301) = {InnerRadiusFactor*0, width-r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 on inlet
         Point(302) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_lower, width-Cos(30*rad2deg)*r_pin_lower*InnerRadiusFactor, 0, gs}; // lower pin1 in between
         Point(303) = {InnerRadiusFactor*r_pin_lower, width, 0, gs}; // lower pin1 on sym
@@ -638,10 +638,10 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
         Transfinite Line {411,450,420,447,421,422,453,431} = N_x_flow;
         Transfinite Line {410,441,430,444} = N_x_flow/2;
         // Progression normal to the pin surface
-        Transfinite Line {440, -449, -448, -442, 451, 452, -443, 446, -454, -445} = N_y_flow Using Progression R_y_flow; 
+        Transfinite Line {440, -449, -448, -442, 451, 452, -443, 446, -454, -445} = N_y_flow Using Progression R_y_flow;
 
         // pin inner parts are in the 500-er range
-        // pin 1 lower 
+        // pin 1 lower
         Point(501) = {InnerRadiusFactor*0, width-r_pin_lower*InnerRadiusFactor, -lower_h, gs}; // lower pin1 on inlet
         Point(502) = {InnerRadiusFactor*Sin(30*rad2deg)*r_pin_lower, width-Cos(30*rad2deg)*r_pin_lower*InnerRadiusFactor, -lower_h, gs}; // lower pin1 in between
         Point(503) = {InnerRadiusFactor*r_pin_lower, width, -lower_h, gs}; // lower pin1 on sym
@@ -775,7 +775,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
 
         Physical Volume("solid_volume") += {28,29,30,31,32,33,34};
 
-        If (1==1) // pin 1 inside lower block 
+        If (1==1) // pin 1 inside lower block
             // pin 1
             Line Loop(427) = {535, -506, -536, -305}; Plane Surface(427) = {427};
             Line Loop(428) = {507, -541, -307, 535};  Plane Surface(428) = {428};
@@ -794,7 +794,7 @@ If (Which_Mesh_Part == 0 || Which_Mesh_Part == 2)
             Physical Volume("solid_volume") += {18,19,20};
         EndIf
 
-        If (1==1) // pin 2 inside lower block 
+        If (1==1) // pin 2 inside lower block
             // pin 2
             Line Loop(435) = {544, -523, -546, -333}; Plane Surface(435) = {435};
             Line Loop(436) = {546, -527, -551, 337};  Plane Surface(436) = {436};
@@ -865,13 +865,15 @@ EndIf
 // Write .su2 meshfile
 If (Write_mesh == 1)
 
-    Mesh.Format = 42; // .su2 mesh format, 
+    Mesh.Format = 42; // .su2 mesh format,
     If (Which_Mesh_Part == 1)
         Save "fluid.su2";
     ElseIf (Which_Mesh_Part == 2)
         Save "solid.su2";
+    ElseIf (Which_Mesh_Part == 0)
+        Save "full.su2";
     Else
-        Printf("Unvalid Which_Mesh_Part variable for output writing.");
+        Printf("Invalid Which_Mesh_Part variable for output writing.");
         Abort;
     EndIf
 
@@ -880,7 +882,7 @@ EndIf
 // Write .cgns meshfile
 //If (Write_mesh == 1)
 //
-//    Mesh.Format = 32; // .cgns mesh format, 
+//    Mesh.Format = 32; // .cgns mesh format,
 //    If (Which_Mesh_Part == 1)
 //        Save "fluid.cgns";
 //    ElseIf (Which_Mesh_Part == 2)
@@ -893,4 +895,3 @@ EndIf
 //    EndIf
 //
 //EndIf
-
